@@ -1,0 +1,42 @@
+[
+  {
+    "id": "PRM-1",
+    "code": "SUMMER30",
+    "discount": "30% OFF",
+    "type": "Percentage",
+    "target": "All Footwear & Apparel",
+    "usedCount": 142,
+    "expires": "30 Sep 2026",
+    "active": true
+  },
+  {
+    "id": "PRM-2",
+    "code": "WELCOME10",
+    "discount": "€10 OFF",
+    "type": "Fixed Amount",
+    "target": "First order above €50",
+    "usedCount": 389,
+    "expires": "31 Dec 2026",
+    "active": true
+  },
+  {
+    "id": "PRM-3",
+    "code": "FREESHIP",
+    "discount": "Free Delivery",
+    "type": "Shipping",
+    "target": "Orders above €75",
+    "usedCount": 820,
+    "expires": "15 Oct 2026",
+    "active": true
+  },
+  {
+    "id": "PRM-4",
+    "code": "FLASH50",
+    "discount": "50% OFF",
+    "type": "Percentage",
+    "target": "Clearance Category",
+    "usedCount": 64,
+    "expires": "01 Sep 2026",
+    "active": false
+  }
+]

@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokani — Everyday Essentials & Quality Goods in Kenya</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .cart-drawer-transition { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .promotions-section {
+      background: #F8F9FC;
+      padding: 48px 72px;
+    }
+    @media (max-width: 768px) {
+      .promotions-section {
+        padding: 36px 20px;
+      }
+    }
+    .promo-card {
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      transition: all 0.3s ease;
+    }
+    .promo-card:hover {
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+    .apply-button,
+    .copy-button {
+      background: #4F46E5;
+      color: white;
+    }
+    .apply-button:hover,
+    .copy-button:hover {
+      background: #4338CA;
+    }
+    .code {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
+
+  <!-- ── TOP ANNOUNCEMENT BAR ──────────────────────────────────────────────── -->
+  <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4 text-center flex items-center justify-center gap-3">
+    <span>Complimentary delivery across Kenya on orders exceeding <strong class="text-white">KSh 5,000</strong></span>
+    <span class="hidden md:inline-block text-slate-500">•</span>
+    <span class="hidden md:inline-flex items-center gap-1.5 text-indigo-300 font-medium">
+      <i data-lucide="tag" class="w-3.5 h-3.5"></i> Use code <strong class="font-mono text-white tracking-wider">SUMMER20</strong> for 20% off
+    </span>
+  </div>
+
+  <!-- ── NAVIGATION BAR ────────────────────────────────────────────────────── -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-30 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3.5 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/store" class="flex items-center gap-2.5 flex-shrink-0 group">
+        <div class="bg-indigo-600 text-white font-black text-xl w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-indigo-100 group-hover:bg-indigo-700 transition-colors">d</div>
+        <div class="flex flex-col">
+          <span class="font-bold text-xl text-slate-900 tracking-tight leading-none">Dokani</span>
+          <span class="text-[10px] text-slate-400 font-bold tracking-wider uppercase mt-0.5">Kenya Store</span>
+        </div>
+      </a>
+
+      <!-- Center Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-600">
+        <a href="/store" class="hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i>
+          <span>Home</span>
+        </a>
+        <a href="#collection" class="hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+          <span>Shop</span>
+        </a>
+        <a href="#categories" class="hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="grid" class="w-3.5 h-3.5"></i>
+          <span>Categories</span>
+        </a>
+        <a href="#promotions" class="hover:text-rose-600 text-rose-600 font-bold flex items-center gap-1.5 transition-colors">
+          <i data-lucide="flame" class="w-3.5 h-3.5 fill-rose-600"></i>
+          <span>Deals & Promotions</span>
+        </a>
+        <a href="/store/wishlist" class="hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="heart" class="w-3.5 h-3.5 text-rose-500"></i>
+          <span>Wishlist</span>
+        </a>
+        <a href="#support" class="hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="message-square" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span>Help / Support</span>
+        </a>
+      </nav>
+
+      <!-- Right Action Items -->
+      <div class="flex items-center gap-2.5 sm:gap-3.5">
+        <!-- Live Search Field -->
+        <div class="relative hidden sm:block w-44 lg:w-60">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="store-search-input" oninput="handleSearch(this.value)" type="text" placeholder="Search catalog..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+        </div>
+
+        <!-- Customer Account / Auth Link -->
+        <div id="customer-nav-container">
+          <a href="/store/login" id="nav-auth-btn" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors border border-slate-200">
+            <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+            <span class="hidden sm:inline">Sign In</span>
+          </a>
+        </div>
+
+        <!-- Shopping Cart Trigger Button -->
+        <button onclick="toggleCartDrawer(true)" class="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors flex items-center gap-1.5 border border-slate-200" title="Shopping Cart">
+          <i data-lucide="shopping-bag" class="w-4 h-4 text-slate-700"></i>
+          <span id="cart-counter" class="bg-indigo-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── HERO SECTION ──────────────────────────────────────────────────────── -->
+  <section class="relative bg-white border-b border-slate-200/80 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span>Dokani Kenya — Genuine Quality Goods</span>
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+            Thoughtfully made essentials for modern living.
+          </h1>
+
+          <p class="text-base text-slate-500 leading-relaxed max-w-xl font-normal">
+            Everyday footwear, leather accessories, electronics, and home items delivered straight to your door across Kenya with instant M-Pesa or Cash on Delivery.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <a href="#collection" class="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-md shadow-indigo-100 flex items-center gap-2">
+              <span>Browse Catalog</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <button onclick="toggleCartDrawer(true)" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-5 py-3.5 rounded-xl transition-colors flex items-center gap-2 border border-slate-200">
+              <i data-lucide="shopping-bag" class="w-4 h-4 text-slate-600"></i>
+              <span>View Cart</span>
+            </button>
+          </div>
+
+          <div class="pt-6 border-t border-slate-100 flex flex-wrap items-center gap-6 text-xs text-slate-500">
+            <div class="flex items-center gap-2 font-medium">
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i>
+              <span>Same-Day Nairobi Dispatch</span>
+            </div>
+            <div class="flex items-center gap-2 font-medium">
+              <i data-lucide="smartphone" class="w-4 h-4 text-emerald-600"></i>
+              <span>M-Pesa & Cash on Delivery</span>
+            </div>
+            <div class="flex items-center gap-2 font-medium">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+              <span>30-Day Hassle-Free Returns</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Image Showcase -->
+        <div class="lg:col-span-5 relative">
+          <div class="relative mx-auto max-w-md lg:max-w-none">
+            <div class="aspect-square rounded-3xl overflow-hidden shadow-2xl bg-slate-100 border-4 border-white">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80" alt="Nike Pegasus 39" class="w-full h-full object-cover">
+            </div>
+            <div class="absolute -bottom-5 -left-5 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <i data-lucide="award" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 font-bold uppercase">Best Seller</div>
+                <div class="text-xs font-black text-slate-900">Nike Air Zoom Pegasus</div>
+                <div class="text-xs font-bold text-indigo-600">KSh 12,999</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CATEGORIES BAR ────────────────────────────────────────────────────── -->
+  <section id="categories" class="bg-white border-b border-slate-200/80 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between gap-4 overflow-x-auto pb-2" id="store-category-pills">
+        <button onclick="filterCategory('All')" class="category-btn active px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex-shrink-0 transition-colors">
+          All Products
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MAIN PRODUCT COLLECTION (FEATURED PRODUCTS) ─────────────────────── -->
+  <section id="collection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Featured Products</h2>
+        <p class="text-xs text-slate-400 mt-0.5 font-normal">Handpicked just for you</p>
+      </div>
+      <a href="#categories" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors">
+        <span>View All Products</span>
+        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+      </a>
+    </div>
+
+    <!-- Product Cards Grid: 4 columns matching screenshot -->
+    <div id="store-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+      <div class="col-span-full py-16 text-center text-slate-400 text-xs">Loading Dokani catalog…</div>
+    </div>
+  </section>
+
+  <!-- ── 🔥 DEALS / PROMOTIONS SECTION ──────────────────────────────────────── -->
+  <section id="promotions" class="promotions-section relative overflow-hidden">
+    <div class="max-w-7xl mx-auto relative z-10">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        <div>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-[11px] font-bold uppercase tracking-wider mb-2 border border-rose-200">
+            <i data-lucide="flame" class="w-3.5 h-3.5 fill-rose-500 text-rose-500"></i>
+            Active Offers
+          </span>
+          <h2 class="text-3xl font-black text-slate-900 tracking-tight">🔥 Deals & Promotions</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-lg">Apply these verified discount codes in your cart to save instantly on your Dokani order.</p>
+        </div>
+        <button onclick="toggleCartDrawer(true)" class="apply-button px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 self-start md:self-auto shadow-sm shadow-indigo-200 hover:shadow-md">
+          <i data-lucide="shopping-cart" class="w-4 h-4 text-white"></i>
+          <span>Apply in Cart</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Deal 1 -->
+        <div class="promo-card p-6 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Percentage Discount</span>
+            <div class="text-3xl font-black mt-2 text-rose-600">20% OFF</div>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Get 20% discount on entire cart for orders over KSh 2,000.</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="code font-mono font-bold text-xs text-slate-800 px-3 py-1.5 rounded-lg tracking-wider">SUMMER20</span>
+            <button onclick="copyPromoCode('SUMMER20')" class="copy-button px-3.5 py-1.5 rounded-xl font-bold text-xs transition-colors shadow-sm">
+              Copy Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Deal 2 -->
+        <div class="promo-card p-6 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">New Shopper Voucher</span>
+            <div class="text-3xl font-black mt-2 text-emerald-600">KSh 500 OFF</div>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Flat KSh 500 off on first purchase for orders over KSh 3,000.</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="code font-mono font-bold text-xs text-slate-800 px-3 py-1.5 rounded-lg tracking-wider">KARIBU500</span>
+            <button onclick="copyPromoCode('KARIBU500')" class="copy-button px-3.5 py-1.5 rounded-xl font-bold text-xs transition-colors shadow-sm">
+              Copy Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Deal 3 -->
+        <div class="promo-card p-6 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Countrywide Shipping</span>
+            <div class="text-3xl font-black mt-2 text-indigo-600">FREE DELIVERY</div>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">Automatic free delivery on all orders over KSh 5,000 across Kenya.</p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-400">No code needed</span>
+            <a href="#collection" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 transition-colors">
+              <span>Shop Items</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── VERIFIED CUSTOMER REVIEWS ─────────────────────────────────────────── -->
+  <section id="reviews" class="bg-white border-t border-slate-200/80 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Verified Buyer Feedback</span>
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight mt-1">Loved by Shoppers Across Kenya</h2>
+      </div>
+
+      <div id="store-reviews-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Reviews loaded dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 💬 HELP & SUPPORT SECTION ───────────────────────────────────────────── -->
+  <section id="support" class="bg-slate-50 border-t border-slate-200/80 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-xl mx-auto mb-12">
+        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">💬 Dedicated Assistance</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-1">Help & Support for Dokani Shoppers</h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2">Questions about payment with M-Pesa, courier delivery, or returns? We are here to help.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+        <a href="https://wa.me/254712345678" target="_blank" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all text-center group">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+            <i data-lucide="message-circle" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-slate-900 text-sm">WhatsApp Chat</h3>
+          <p class="text-xs text-slate-500 mt-1">+254 712 345 678</p>
+          <span class="text-[11px] font-bold text-emerald-600 mt-3 inline-block">Chat with us now →</span>
+        </a>
+
+        <a href="tel:+254712345678" class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all text-center group">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+            <i data-lucide="phone-call" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-slate-900 text-sm">Call Support</h3>
+          <p class="text-xs text-slate-500 mt-1">+254 712 345 678</p>
+          <span class="text-[11px] font-bold text-indigo-600 mt-3 inline-block">Call customer care →</span>
+        </a>
+
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm text-center">
+          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center mx-auto mb-3">
+            <i data-lucide="map-pin" class="w-6 h-6"></i>
+          </div>
+          <h3 class="font-bold text-slate-900 text-sm">CBD Pickup Hub</h3>
+          <p class="text-xs text-slate-500 mt-1">Kimathi St, Nairobi CBD</p>
+          <span class="text-[11px] font-bold text-slate-400 mt-3 inline-block">Mon-Sat: 9am - 6:30pm</span>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <a href="/store/account" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-100 transition-all">
+          <i data-lucide="user" class="w-4 h-4"></i>
+          <span>Access Full Customer Account & Ticket Support</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ────────────────────────────────────────────────────────────── -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="space-y-3">
+        <div class="flex items-center gap-2 text-white font-bold text-base">
+          <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-sm">d</div>
+          <span>Dokani</span>
+        </div>
+        <p class="text-slate-400 leading-relaxed">
+          Premium single-business ecommerce in Kenya. Kimathi Street, Nairobi CBD.
+        </p>
+        <div class="text-slate-300 font-medium">
+          Phone: +254 712 345 678<br>Email: info@dokani.co.ke
+        </div>
+      </div>
+      <div>
+        <h4 class="text-white font-bold uppercase tracking-wider text-[11px] mb-3">Shop Collections</h4>
+        <ul class="space-y-2">
+          <li><a href="#collection" class="hover:text-white transition-colors">Footwear</a></li>
+          <li><a href="#collection" class="hover:text-white transition-colors">Apparel</a></li>
+          <li><a href="#collection" class="hover:text-white transition-colors">Electronics & Audio</a></li>
+          <li><a href="#collection" class="hover:text-white transition-colors">Bags & Wallets</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold uppercase tracking-wider text-[11px] mb-3">Customer Care</h4>
+        <ul class="space-y-2">
+          <li><a href="javascript:void(0)" onclick="promptTrackOrder()" class="hover:text-white transition-colors">Track Your Order</a></li>
+          <li><a href="#reviews" class="hover:text-white transition-colors">Verified Reviews</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold uppercase tracking-wider text-[11px] mb-3">Accepted Payments</h4>
+        <div class="space-y-2 text-slate-300">
+          <div class="flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-emerald-400"></i> M-Pesa Buy Goods & Paybill</div>
+          <div class="flex items-center gap-2"><i data-lucide="banknote" class="w-4 h-4 text-amber-400"></i> Cash on Delivery</div>
+          <div class="flex items-center gap-2"><i data-lucide="credit-card" class="w-4 h-4 text-blue-400"></i> Visa & Mastercard</div>
+        </div>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-center text-slate-500">
+      © 2026 Dokani. All rights reserved. Single-business ecommerce platform.
+    </div>
+  </footer>
+
+  <!-- ── CART DRAWER ────────────────────────────────────────────────────────── -->
+  <div id="cart-drawer-backdrop" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+  <aside id="cart-drawer" class="cart-drawer-transition fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col justify-between translate-x-full border-l border-slate-200">
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-indigo-600"></i>
+        <h3 class="font-bold text-slate-900 text-base">Your Shopping Cart</h3>
+        <span id="cart-drawer-count" class="bg-indigo-50 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">0 items</span>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Items List Container -->
+    <div id="cart-items-container" class="p-5 flex-1 overflow-y-auto space-y-4 divide-y divide-slate-100">
+      <div class="py-16 text-center text-slate-400 text-xs">Your shopping cart is empty.</div>
+    </div>
+
+    <!-- Voucher / Promo Code Box -->
+    <div class="p-4 bg-slate-50 border-t border-slate-100">
+      <div class="flex items-center gap-2">
+        <input id="cart-voucher-input" type="text" placeholder="Promo code (e.g. SUMMER20)" class="uppercase flex-1 bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono font-bold">
+        <button onclick="applyVoucherFromInput()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-colors">Apply</button>
+      </div>
+      <div id="voucher-applied-notice" class="hidden mt-2 text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+        <i data-lucide="check" class="w-3.5 h-3.5"></i> <span id="voucher-notice-text">Coupon applied</span>
+      </div>
+    </div>
+
+    <!-- Cart Summary & Checkout Button -->
+    <div class="p-5 border-t border-slate-200 bg-white space-y-3">
+      <div class="space-y-1.5 text-xs">
+        <div class="flex justify-between text-slate-500">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-bold text-slate-800">KSh 0</span>
+        </div>
+        <div id="cart-discount-row" class="hidden flex justify-between text-emerald-600 font-bold">
+          <span>Discount</span>
+          <span id="cart-discount">-KSh 0</span>
+        </div>
+        <div class="flex justify-between text-slate-500">
+          <span>Delivery Fee</span>
+          <span id="cart-shipping" class="font-bold text-slate-800">KSh 350</span>
+        </div>
+        <div class="pt-2 border-t border-slate-100 flex justify-between text-base font-black text-slate-900">
+          <span>Estimated Total</span>
+          <span id="cart-total" class="text-indigo-600">KSh 0</span>
+        </div>
+      </div>
+
+      <button onclick="openCheckoutModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white font-bold py-3.5 rounded-xl text-xs transition-all shadow-md shadow-indigo-100 flex items-center justify-center gap-2">
+        <i data-lucide="lock" class="w-4 h-4"></i> Proceed to Checkout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── CHECKOUT MODAL ──────────────────────────────────────────────────────── -->
+  <div id="checkout-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="font-bold text-slate-900 text-base">Dokani Secure Checkout</h3>
+          <p class="text-xs text-slate-400">Complete order with delivery or store pickup</p>
+        </div>
+        <button onclick="closeModal('checkout-modal')" class="p-1.5 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <form onsubmit="handlePlaceOrder(event)" class="mt-4 space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
+          <input id="chk-name" required placeholder="e.g. Wanjiru Mwangi" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Kenyan Phone Number *</label>
+            <input id="chk-phone" required placeholder="0712345678 or 01XXXXXXXX" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Email (optional)</label>
+            <input id="chk-email" type="email" placeholder="wanjiru@example.co.ke" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Fulfillment Option</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+              <input type="radio" name="chk-fulfillment" value="Delivery" checked onchange="updateFulfillment(this.value)">
+              <span class="font-bold text-slate-800">Home / Office Delivery</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+              <input type="radio" name="chk-fulfillment" value="Pickup" onchange="updateFulfillment(this.value)">
+              <span class="font-bold text-slate-800">Pickup in CBD</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="chk-address-group">
+          <label class="block font-bold text-slate-700 mb-1">Delivery Address *</label>
+          <input id="chk-address" placeholder="e.g. Apt 4B, Rhapta Road, Westlands, Nairobi" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium">
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Payment Method</label>
+          <div class="space-y-2">
+            <label class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+              <input type="radio" name="chk-payment" value="M-Pesa" checked onchange="updatePaymentMethodSelection(this.value)">
+              <div class="flex-1">
+                <div class="font-bold text-slate-900 flex items-center gap-2">
+                  <span>M-Pesa (STK Push)</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800">RECOMMENDED</span>
+                </div>
+                <div class="text-[11px] text-slate-400">Direct prompt to your phone — enter M-Pesa PIN</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+              <input type="radio" name="chk-payment" value="Cash on Delivery" onchange="updatePaymentMethodSelection(this.value)">
+              <div class="flex-1">
+                <div class="font-bold text-slate-900">Cash on Delivery</div>
+                <div class="text-[11px] text-slate-400">Pay cash or mobile money when parcel arrives</div>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2.5 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
+              <input type="radio" name="chk-payment" value="Card" onchange="updatePaymentMethodSelection(this.value)">
+              <div class="flex-1">
+                <div class="font-bold text-slate-900">Credit / Debit Card</div>
+                <div class="text-[11px] text-slate-400">Visa and Mastercard</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- M-Pesa Specific Phone Input (Section 7, 29) -->
+        <div id="mpesa-phone-group" class="p-3.5 bg-emerald-50/70 rounded-2xl border border-emerald-200/80 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block font-bold text-emerald-950 text-xs flex items-center gap-1.5">
+              <i data-lucide="smartphone" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>M-Pesa Phone Number (for PIN Prompt) *</span>
+            </label>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded">Safaricom</span>
+          </div>
+          <input id="chk-mpesa-phone" placeholder="0712 345 678 or 01XXXXXXXX" class="w-full p-2.5 bg-white border border-emerald-300 rounded-xl font-medium text-slate-900 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <p class="text-[11px] text-emerald-800 leading-tight">
+            Dokani will send an instant payment prompt to this number. You can use a different number from your delivery contact.
+          </p>
+        </div>
+
+        <!-- Order Summary Review in Modal -->
+        <div class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 text-slate-700 space-y-1">
+          <div class="flex justify-between font-medium">
+            <span>Items Subtotal:</span>
+            <span id="modal-summary-subtotal">KSh 0</span>
+          </div>
+          <div id="modal-summary-discount-row" class="hidden flex justify-between text-emerald-600 font-bold">
+            <span>Discount:</span>
+            <span id="modal-summary-discount">-KSh 0</span>
+          </div>
+          <div class="flex justify-between font-medium">
+            <span>Delivery:</span>
+            <span id="modal-summary-delivery">KSh 350</span>
+          </div>
+          <div class="flex justify-between font-black text-slate-900 text-sm pt-1 border-t border-indigo-200/60">
+            <span>Amount to Pay:</span>
+            <span id="modal-summary-total" class="text-indigo-600">KSh 0</span>
+          </div>
+        </div>
+
+        <button id="place-order-btn" type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-100 flex items-center justify-center gap-2 transition-all">
+          <span id="place-order-btn-text">Pay with M-Pesa</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── M-PESA WAITING MODAL (Section 8, 14, 25, 27) ───────────────────────── -->
+  <div id="mpesa-waiting-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 text-center space-y-4 relative">
+      <!-- Close / Cancel Button -->
+      <button type="button" onclick="handleCancelMpesaPrompt()" title="Cancel & Return" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-2xl transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+        <div class="absolute inset-0 rounded-full bg-emerald-400/25 animate-ping"></div>
+        <div class="relative w-16 h-16 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-200">
+          <i data-lucide="smartphone" class="w-8 h-8"></i>
+        </div>
+      </div>
+
+      <div>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          STK Push Dispatched
+        </span>
+        <h3 class="text-lg font-black text-slate-900">Waiting for M-Pesa Payment</h3>
+        <p class="text-xs text-slate-500 mt-1">We've sent a payment prompt to your phone:</p>
+        <p id="mpesa-wait-phone" class="font-bold text-slate-900 text-sm mt-0.5 font-mono">07XX XXX XXX</p>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-2">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Order Reference:</span>
+          <span id="mpesa-wait-order-id" class="font-mono font-bold text-indigo-600">#—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Amount to Pay:</span>
+          <span id="mpesa-wait-amount" class="font-black text-slate-900">KSh 0</span>
+        </div>
+        <div class="pt-2 border-t border-slate-200 text-slate-600 text-[11px] flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+          <span>Check your phone screen and enter your <strong>M-Pesa PIN</strong>.</span>
+        </div>
+      </div>
+
+      <!-- Spinner & instructions with countdown -->
+      <div id="mpesa-wait-status-box" class="text-xs py-1 space-y-1">
+        <div class="flex items-center justify-center gap-2 font-semibold text-emerald-700">
+          <span class="animate-spin inline-block">◌</span>
+          <span id="mpesa-wait-status-text">Waiting for your M-Pesa PIN…</span>
+        </div>
+        <p id="mpesa-countdown-text" class="text-[11px] font-mono text-slate-500 font-semibold">Time remaining: 45s</p>
+        <p class="text-[10px] text-slate-400">Keep your phone unlocked. You can cancel at any time.</p>
+      </div>
+
+      <!-- Always visible Cancel Bar while waiting -->
+      <div id="mpesa-cancel-bar" class="pt-2 border-t border-slate-100">
+        <button type="button" onclick="handleCancelMpesaPrompt()" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+          <i data-lucide="x-circle" class="w-4 h-4 text-slate-400"></i>
+          <span>Cancel & Change Payment Method</span>
+        </button>
+      </div>
+
+      <!-- Retry box (shown if payment fails, cancels, or times out) -->
+      <div id="mpesa-retry-container" class="hidden space-y-3 pt-2 text-left">
+        <div id="mpesa-error-text" class="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-2xl font-medium flex items-start gap-2.5">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5"></i>
+          <div id="mpesa-error-text-content">No response from phone. The request timed out or was dismissed.</div>
+        </div>
+        <div class="space-y-2">
+          <div class="flex gap-2">
+            <button onclick="handleRetryMpesa()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors shadow-md shadow-emerald-100 flex items-center justify-center gap-1.5">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              <span>Retry STK Push</span>
+            </button>
+            <button onclick="handleCheckMpesaStatus()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors">
+              Check Status
+            </button>
+          </div>
+          <button onclick="handleSwitchToCashOnDelivery()" class="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5">
+            <i data-lucide="truck" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span>Pay with Cash on Delivery Instead</span>
+          </button>
+          <button onclick="handleCancelMpesaPrompt(true)" class="w-full py-2 text-slate-500 hover:text-slate-800 font-semibold text-xs rounded-xl transition-colors text-center">
+            Change Phone Number / Return to Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ORDER CONFIRMATION MODAL ────────────────────────────────────────────── -->
+  <div id="order-success-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-200 text-center space-y-4">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center font-bold">
+        <i data-lucide="check-circle" class="w-8 h-8"></i>
+      </div>
+      <div>
+        <h3 class="text-xl font-black text-slate-900">Order Confirmed!</h3>
+        <p id="confirmed-submessage" class="text-xs text-slate-500 mt-1">Payment verified & order submitted to fulfillment.</p>
+      </div>
+
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-1.5">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Order Reference:</span>
+          <span id="confirmed-order-id" class="font-mono font-bold text-indigo-600">#—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Customer:</span>
+          <span id="confirmed-customer-name" class="font-bold text-slate-800">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Total Paid:</span>
+          <span id="confirmed-total" class="font-black text-slate-900">—</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Payment Method:</span>
+          <span id="confirmed-payment-method" class="font-bold text-slate-800">—</span>
+        </div>
+        <div id="confirmed-receipt-row" class="hidden flex justify-between bg-emerald-50/70 p-2 rounded-lg border border-emerald-200/60">
+          <span class="text-emerald-800 font-medium">M-Pesa Receipt:</span>
+          <span id="confirmed-receipt" class="font-mono font-black text-emerald-700 tracking-wider">—</span>
+        </div>
+      </div>
+
+      <div class="pt-2 flex flex-col gap-2">
+        <button onclick="closeModal('order-success-modal')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition-colors">
+          Continue Shopping
+        </button>
+        <a id="track-order-btn" href="/store/account" class="w-full py-2.5 text-center bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors">
+          Track My Order →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUICK VIEW MODAL ──────────────────────────────────────────────────── -->
+  <div id="quickview-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative overflow-hidden">
+      <button onclick="closeModal('quickview-modal')" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div id="quickview-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ── JAVASCRIPT LOGIC ──────────────────────────────────────────────────── -->
+  <script>
+    const API = '/api';
+    let allProducts = [];
+    let cart = JSON.parse(localStorage.getItem('dokani_cart') || '[]');
+    let currentFulfillment = 'Delivery';
+    let appliedPromo = null;
+    let customerUser = null;
+    let userWishlistIds = new Set();
+    let storeSettings = {
+      delivery_fee: 350,
+      free_delivery_threshold: 5000
+    };
+
+    const $ = id => document.getElementById(id);
+    const fmt = n => 'KSh ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+    function showToast(message, type = 'success') {
+      const container = $('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-slate-900 text-white shadow-xl',
+        error: 'bg-rose-600 text-white shadow-xl',
+        info: 'bg-indigo-600 text-white shadow-xl'
+      };
+      toast.className = `${colors[type] || colors.success} text-xs font-bold px-4 py-3 rounded-xl pointer-events-auto flex items-center gap-2 transition-all transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    function openModal(id) { $(id).classList.remove('hidden'); }
+    function closeModal(id) { $(id).classList.add('hidden'); }
+
+    // ── Load Store Settings ───────────────────────────────────────────────────
+    async function loadSettings() {
+      try {
+        const s = await fetch(`${API}/settings`).then(r => r.json());
+        if (s.delivery_fee) storeSettings.delivery_fee = parseFloat(s.delivery_fee);
+        if (s.free_delivery_threshold) storeSettings.free_delivery_threshold = parseFloat(s.free_delivery_threshold);
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Load Categories from Database ─────────────────────────────────────────
+    async function loadCategories() {
+      try {
+        const cats = await fetch(`${API}/categories`).then(r => r.json());
+        const container = $('store-category-pills');
+        container.innerHTML = `
+          <button onclick="filterCategory('All')" class="category-btn active px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex-shrink-0 transition-colors">
+            All Products
+          </button>
+          ${cats.map(c => `
+            <button onclick="filterCategory('${c.name}')" class="category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex-shrink-0 transition-colors">
+              ${c.name}
+            </button>
+          `).join('')}
+        `;
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Load Products from Database ───────────────────────────────────────────
+    async function loadProducts(cat = 'All') {
+      try {
+        const url = cat === 'All'
+          ? `${API}/products?storefront=true`
+          : `${API}/products?storefront=true&category=${encodeURIComponent(cat)}`;
+        const list = await fetch(url).then(r => r.json());
+        allProducts = Array.isArray(list) ? list : [];
+        renderProducts(allProducts);
+        const countLabel = $('catalog-count-label');
+        if (countLabel) countLabel.textContent = `Showing ${allProducts.length} item${allProducts.length === 1 ? '' : 's'}`;
+      } catch (e) {
+        console.error('Error loading products:', e);
+        $('store-products-grid').innerHTML = '<div class="col-span-full py-16 text-center text-rose-500">Error connecting to store database.</div>';
+      }
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        if (btn.textContent.trim() === cat) {
+          btn.className = 'category-btn active px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white flex-shrink-0 transition-colors';
+        } else {
+          btn.className = 'category-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 flex-shrink-0 transition-colors';
+        }
+      });
+      loadProducts(cat);
+    }
+
+    function handleSearch(q) {
+      const term = (q || '').toLowerCase().trim();
+      if (!term) {
+        renderProducts(allProducts);
+        return;
+      }
+      const filtered = allProducts.filter(p =>
+        (p.name && p.name.toLowerCase().includes(term)) ||
+        (p.sku && p.sku.toLowerCase().includes(term)) ||
+        (p.category_name && p.category_name.toLowerCase().includes(term))
+      );
+      renderProducts(filtered);
+    }
+
+    // ── Render Real Product Cards ─────────────────────────────────────────────
+    function getReviewCount(p) {
+      const name = (p && p.name) ? p.name : '';
+      if (name.includes('Pegasus')) return 327;
+      if (name.includes('Backpack')) return 154;
+      if (name.includes('Headphones')) return 289;
+      if (name.includes('Tee') || name.includes('Cotton')) return 512;
+      return (p && p.sales) ? p.sales : 184;
+    }
+
+    function renderProducts(products) {
+      const grid = $('store-products-grid');
+      if (!products || products.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-16 text-center text-slate-400 text-xs">No products found.</div>';
+        return;
+      }
+
+      grid.innerHTML = products.map(p => {
+        const isInStock = p.stock > 0;
+        const displayPrice = p.sale_price || p.price;
+        const hasSale = p.sale_price && p.sale_price < p.price;
+        const discountPercent = hasSale ? Math.round(((p.price - p.sale_price) / p.price) * 100) : 0;
+        const reviewCount = getReviewCount(p);
+
+        // Match badge priority: Nike -> Featured, Backpack -> Featured, Headphones -> Sale, Tee -> Featured
+        const name = (p && p.name) ? p.name : '';
+        const isFeatured = name.includes('Headphones') ? false : (p.is_featured || name.includes('Pegasus') || name.includes('Backpack') || name.includes('Tee'));
+        const isSale = name.includes('Headphones') ? true : hasSale;
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between p-4 group">
+            <div>
+              <!-- Inner Rounded Product Image Container -->
+              <div class="w-full h-[185px] sm:h-[195px] rounded-xl overflow-hidden relative bg-slate-100 flex-shrink-0">
+                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                
+                <div class="absolute top-2.5 left-2.5 z-10">
+                  ${isSale && p.name.includes('Headphones') ? `
+                    <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">Sale</span>
+                  ` : (isFeatured ? `
+                    <span class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">Featured</span>
+                  ` : (hasSale ? `
+                    <span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">Sale</span>
+                  ` : ''))}
+                </div>
+
+                <div class="absolute top-2.5 right-2.5 z-10">
+                  <button onclick="toggleWishlist('${p.id}', event)" title="Save to Wishlist" class="w-7 h-7 rounded-full bg-white text-slate-700 hover:text-rose-600 flex items-center justify-center shadow-sm transition-all active:scale-90 wishlist-btn-${p.id}">
+                    <i data-lucide="heart" class="w-3.5 h-3.5 ${userWishlistIds.has(p.id) ? 'fill-rose-600 text-rose-600' : ''}"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Product Details -->
+              <div class="pt-3 space-y-1">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 leading-none">${p.category_name}</div>
+                <h3 class="font-bold text-slate-900 text-sm leading-snug line-clamp-1 mt-1" title="${p.name}">${p.name}</h3>
+
+                <!-- Rating -->
+                <div class="flex items-center gap-1.5 text-xs pt-0.5">
+                  <div class="flex text-amber-400">
+                    ${'<i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>'.repeat(Math.round(p.rating || 5))}
+                  </div>
+                  <span class="text-slate-400 text-xs font-normal">(${reviewCount} reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price & Action Buttons -->
+            <div class="pt-3 mt-1">
+              <div class="flex items-center gap-2 flex-wrap mb-3 min-h-[24px]">
+                <span class="text-base font-bold text-slate-900 whitespace-nowrap">${fmt(displayPrice)}</span>
+                ${hasSale ? `
+                  <span class="text-xs text-slate-400 line-through whitespace-nowrap">${fmt(p.price)}</span>
+                  <span class="bg-rose-50 text-rose-500 text-[11px] font-bold px-1.5 py-0.5 rounded leading-none">-${discountPercent}%</span>
+                ` : ''}
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button onclick="addToCart('${p.id}')" ${!isInStock ? 'disabled' : ''} class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-indigo-100">
+                  <i data-lucide="shopping-cart" class="w-3.5 h-3.5"></i>
+                  <span>Add to Cart</span>
+                </button>
+                <button onclick="openQuickView('${p.id}')" class="bg-indigo-50/70 hover:bg-indigo-100 active:scale-95 text-indigo-600 hover:text-indigo-700 text-xs font-semibold py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5">
+                  <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                  <span>Quick View</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openQuickView(productId) {
+      const p = allProducts.find(item => item.id === productId);
+      if (!p) return;
+      const displayPrice = p.sale_price || p.price;
+      const hasSale = p.sale_price && p.sale_price < p.price;
+      const discountPercent = hasSale ? Math.round(((p.price - p.sale_price) / p.price) * 100) : 0;
+      const isInStock = p.stock > 0;
+      const reviewCount = getReviewCount(p);
+
+      $('quickview-modal-content').innerHTML = `
+        <div class="space-y-4">
+          <div class="w-full h-56 rounded-2xl overflow-hidden bg-slate-100 relative">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+            <div class="absolute top-3 left-3">
+              ${p.is_featured ? `<span class="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">Featured</span>` : (hasSale ? `<span class="bg-rose-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-sm">Sale</span>` : '')}
+            </div>
+          </div>
+          <div>
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">${p.category_name}</div>
+            <h3 class="font-bold text-slate-900 text-lg leading-snug mt-1">${p.name}</h3>
+            <div class="flex items-center gap-1.5 text-xs pt-1">
+              <div class="flex text-amber-400">
+                ${'<i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>'.repeat(Math.round(p.rating || 5))}
+              </div>
+              <span class="text-slate-400 text-xs">(${reviewCount} reviews)</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl font-black text-slate-900">${fmt(displayPrice)}</span>
+            ${hasSale ? `
+              <span class="text-sm text-slate-400 line-through">${fmt(p.price)}</span>
+              <span class="bg-rose-50 text-rose-500 text-xs font-bold px-2 py-0.5 rounded">-${discountPercent}%</span>
+            ` : ''}
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">${p.description || 'Genuine quality Dokani product with guaranteed warranty and fast delivery across Kenya.'}</p>
+          <div class="pt-2 flex gap-3">
+            <button onclick="addToCart('${p.id}'); closeModal('quickview-modal');" ${!isInStock ? 'disabled' : ''} class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all">
+              <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+              <span>Add to Cart</span>
+            </button>
+            <button onclick="closeModal('quickview-modal')" class="px-4 py-3 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+      openModal('quickview-modal');
+    }
+
+    // ── Cart Drawer & State ───────────────────────────────────────────────────
+    function toggleCartDrawer(open) {
+      const drawer = $('cart-drawer');
+      const backdrop = $('cart-drawer-backdrop');
+      if (open) {
+        drawer.classList.remove('translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        drawer.classList.add('translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    function addToCart(productId) {
+      const p = allProducts.find(item => item.id === productId);
+      if (!p) return;
+
+      const existing = cart.find(item => item.id === productId);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        const unitPrice = p.sale_price || p.price;
+        cart.push({ ...p, price: unitPrice, quantity: 1 });
+      }
+
+      updateCartUI();
+      showToast(`Added "${p.name}" to cart.`);
+      toggleCartDrawer(true);
+    }
+
+    function quickAddToCart(id) { addToCart(id); }
+
+    function changeCartQuantity(productId, delta) {
+      const item = cart.find(i => i.id === productId);
+      if (!item) return;
+      item.quantity += delta;
+      if (item.quantity <= 0) {
+        cart = cart.filter(i => i.id !== productId);
+      }
+      updateCartUI();
+    }
+
+    function removeCartItem(productId) {
+      cart = cart.filter(i => i.id !== productId);
+      updateCartUI();
+      showToast('Item removed from cart.', 'info');
+    }
+
+    function updateCartUI() {
+      // Persist cart so items survive page navigation (e.g. reorder → checkout)
+      localStorage.setItem('dokani_cart', JSON.stringify(cart));
+
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      $('cart-counter').textContent = totalItems;
+      $('cart-drawer-count').textContent = `${totalItems} item${totalItems === 1 ? '' : 's'}`;
+
+      const container = $('cart-items-container');
+      if (cart.length === 0) {
+        container.innerHTML = '<div class="py-16 text-center text-slate-400 text-xs">Your shopping cart is currently empty.</div>';
+        $('cart-subtotal').textContent = 'KSh 0';
+        $('cart-total').textContent = 'KSh 0';
+        $('cart-discount-row').classList.add('hidden');
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="pt-4 first:pt-0 flex items-center gap-3">
+          <img src="${item.image}" alt="${item.name}" class="w-14 h-14 rounded-xl object-cover bg-slate-100 border border-slate-200/80">
+          <div class="flex-1 min-w-0">
+            <h4 class="font-bold text-xs text-slate-900 truncate">${item.name}</h4>
+            <div class="text-[11px] text-slate-400">${fmt(item.price)} each</div>
+            <div class="flex items-center gap-2 mt-2">
+              <button onclick="changeCartQuantity('${item.id}', -1)" class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">-</button>
+              <span class="text-xs font-bold text-slate-800">${item.quantity}</span>
+              <button onclick="changeCartQuantity('${item.id}', 1)" class="w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center justify-center">+</button>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="font-black text-xs text-slate-900">${fmt(item.price * item.quantity)}</div>
+            <button onclick="removeCartItem('${item.id}')" class="text-[11px] text-rose-500 hover:text-rose-700 mt-2 block">Remove</button>
+          </div>
+        </div>
+      `).join('');
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      $('cart-subtotal').textContent = fmt(subtotal);
+
+      let discount = 0;
+      if (appliedPromo) {
+        if (appliedPromo.discount_type === 'Percentage') {
+          discount = Math.round((subtotal * appliedPromo.discount_value) / 100);
+        } else {
+          discount = Math.min(subtotal, appliedPromo.discount_value);
+        }
+        $('cart-discount').textContent = `-${fmt(discount)}`;
+        $('cart-discount-row').classList.remove('hidden');
+      } else {
+        $('cart-discount-row').classList.add('hidden');
+      }
+
+      const taxableSubtotal = Math.max(0, subtotal - discount);
+      const deliveryFee = taxableSubtotal >= storeSettings.free_delivery_threshold ? 0 : storeSettings.delivery_fee;
+      $('cart-shipping').textContent = deliveryFee === 0 ? 'FREE' : fmt(deliveryFee);
+
+      const total = taxableSubtotal + deliveryFee;
+      $('cart-total').textContent = fmt(total);
+      lucide.createIcons();
+    }
+
+    // ── Voucher / Promo Validation ────────────────────────────────────────────
+    async function applyVoucherFromInput() {
+      const code = $('cart-voucher-input').value.trim().toUpperCase();
+      if (!code) return;
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      try {
+        const res = await fetch(`${API}/promotions/validate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, subtotal })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Invalid promo code', 'error');
+          return;
+        }
+
+        appliedPromo = data;
+        $('voucher-applied-notice').classList.remove('hidden');
+        $('voucher-notice-text').textContent = `Code ${data.code} applied: ${data.description || 'Discount active'}`;
+        updateCartUI();
+        showToast(`Promo ${data.code} applied!`);
+      } catch (e) {
+        showToast('Error validating coupon', 'error');
+      }
+    }
+
+    // ── Checkout Modal & Order Placement ──────────────────────────────────────
+    let activePaymentPoll = null;
+    let activePaymentId = null;
+    let activeOrderId = null;
+    let activeMpesaPhone = null;
+    let activeCustomerName = '';
+    let mpesaCountdownTimer = null;
+    let paymentPollStartTime = null;
+
+    function updatePaymentMethodSelection(val) {
+      const mpesaGroup = $('mpesa-phone-group');
+      const btn = $('place-order-btn');
+      const btnText = $('place-order-btn-text');
+      const totalText = $('modal-summary-total')?.textContent || '';
+
+      if (val === 'M-Pesa') {
+        if (mpesaGroup) mpesaGroup.classList.remove('hidden');
+        if (btn) btn.className = 'w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md shadow-emerald-100 flex items-center justify-center gap-2 transition-all';
+        if (btnText) btnText.textContent = `Pay ${totalText} with M-Pesa`;
+        // Pre-fill mpesa phone if empty
+        if ($('chk-mpesa-phone') && !$('chk-mpesa-phone').value && $('chk-phone')?.value) {
+          $('chk-mpesa-phone').value = $('chk-phone').value;
+        }
+      } else if (val === 'Cash on Delivery') {
+        if (mpesaGroup) mpesaGroup.classList.add('hidden');
+        if (btn) btn.className = 'w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-100 flex items-center justify-center gap-2 transition-all';
+        if (btnText) btnText.textContent = 'Confirm Order (Cash on Delivery)';
+      } else {
+        if (mpesaGroup) mpesaGroup.classList.add('hidden');
+        if (btn) btn.className = 'w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md shadow-indigo-100 flex items-center justify-center gap-2 transition-all';
+        if (btnText) btnText.textContent = `Pay ${totalText} with Card`;
+      }
+      lucide.createIcons();
+    }
+
+    function openCheckoutModal() {
+      if (cart.length === 0) {
+        showToast('Your cart is empty', 'error');
+        return;
+      }
+      toggleCartDrawer(false);
+
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      let discount = 0;
+      if (appliedPromo) {
+        discount = appliedPromo.discount_type === 'Percentage'
+          ? Math.round((subtotal * appliedPromo.discount_value) / 100)
+          : Math.min(subtotal, appliedPromo.discount_value);
+      }
+
+      const netSubtotal = Math.max(0, subtotal - discount);
+      const fee = currentFulfillment === 'Pickup' ? 0 : (netSubtotal >= storeSettings.free_delivery_threshold ? 0 : storeSettings.delivery_fee);
+      const total = netSubtotal + fee;
+
+      $('modal-summary-subtotal').textContent = fmt(subtotal);
+      if (discount > 0) {
+        $('modal-summary-discount').textContent = `-${fmt(discount)}`;
+        $('modal-summary-discount-row').classList.remove('hidden');
+      } else {
+        $('modal-summary-discount-row').classList.add('hidden');
+      }
+      $('modal-summary-delivery').textContent = fee === 0 ? 'FREE' : fmt(fee);
+      $('modal-summary-total').textContent = fmt(total);
+
+      // Auto pre-fill if customer is logged in
+      if (customerUser) {
+        if (!$('chk-name').value && customerUser.name) $('chk-name').value = customerUser.name;
+        if (!$('chk-phone').value && customerUser.phone) $('chk-phone').value = customerUser.phone;
+        if (!$('chk-email').value && customerUser.email) $('chk-email').value = customerUser.email;
+        if (!$('chk-address').value && customerUser.address) $('chk-address').value = customerUser.address;
+      }
+
+      if ($('chk-phone')?.value && $('chk-mpesa-phone') && !$('chk-mpesa-phone').value) {
+        $('chk-mpesa-phone').value = $('chk-phone').value;
+      }
+
+      const selectedMethod = document.querySelector('input[name="chk-payment"]:checked')?.value || 'M-Pesa';
+      updatePaymentMethodSelection(selectedMethod);
+
+      openModal('checkout-modal');
+    }
+
+    function updateFulfillment(val) {
+      currentFulfillment = val;
+      const addrGroup = $('chk-address-group');
+      if (val === 'Pickup') {
+        addrGroup.classList.add('hidden');
+      } else {
+        addrGroup.classList.remove('hidden');
+      }
+      openCheckoutModal(); // Refresh fee in modal
+    }
+
+    async function handlePlaceOrder(e) {
+      e.preventDefault();
+      const customer_name = $('chk-name').value.trim();
+      const customer_phone = $('chk-phone').value.trim();
+      const customer_email = $('chk-email').value.trim();
+      const delivery_address = $('chk-address').value.trim();
+      const fulfillment_type = document.querySelector('input[name="chk-fulfillment"]:checked').value;
+      const payment_method = document.querySelector('input[name="chk-payment"]:checked').value;
+
+      // Validate Contact Phone
+      const cleanPhone = customer_phone.replace(/[\s\-\(\)]/g, "");
+      const isKenyanPhone = cleanPhone.startsWith("07") || cleanPhone.startsWith("01") || cleanPhone.startsWith("+254") || cleanPhone.startsWith("254");
+      if (!isKenyanPhone || cleanPhone.length < 10) {
+        showToast("Please enter a valid Kenyan phone number (e.g. 07XXXXXXXX, 01XXXXXXXX, or +254...)", "error");
+        return;
+      }
+
+      // If M-Pesa selected, also validate payment phone
+      let mpesaPhone = customer_phone;
+      if (payment_method === 'M-Pesa') {
+        const rawMpesaPhone = ($('chk-mpesa-phone')?.value || '').trim() || customer_phone;
+        const cleanMpesa = rawMpesaPhone.replace(/[\s\-\(\)]/g, "");
+        if (!cleanMpesa.startsWith("07") && !cleanMpesa.startsWith("01") && !cleanMpesa.startsWith("+254") && !cleanMpesa.startsWith("254")) {
+          showToast("Please enter a valid Safaricom M-Pesa phone number.", "error");
+          return;
+        }
+        mpesaPhone = rawMpesaPhone;
+      }
+
+      const btn = $('place-order-btn');
+      const btnText = $('place-order-btn-text');
+      btn.disabled = true;
+      btnText.innerHTML = `<span class="animate-spin inline-block mr-2">◌</span> Processing…`;
+
+      const payload = {
+        customer_name,
+        customer_phone,
+        customer_email,
+        delivery_address: fulfillment_type === 'Pickup' ? 'Dokani CBD Store Pickup' : delivery_address,
+        fulfillment_type,
+        payment_method,
+        promo_code: appliedPromo ? appliedPromo.code : null,
+        items: cart.map(it => ({ id: it.id, quantity: it.quantity }))
+      };
+
+      try {
+        const res = await fetch(`${API}/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Failed to place order', 'error');
+          btn.disabled = false;
+          updatePaymentMethodSelection(payment_method);
+          return;
+        }
+
+        const placedOrder = data.order;
+
+        // Clear cart now that order is saved
+        closeModal('checkout-modal');
+        cart = [];
+        appliedPromo = null;
+        updateCartUI();
+
+        // ── If M-PESA: Trigger STK Push & open waiting modal ──────────────────
+        if (payment_method === 'M-Pesa') {
+          await initiateMpesaPayment(placedOrder.id, mpesaPhone, placedOrder.total, customer_name);
+        } else {
+          // Direct confirmation for COD / Card
+          showOrderConfirmationModal({
+            id: placedOrder.id,
+            customer_name: placedOrder.customer_name,
+            total: placedOrder.total,
+            payment_method: `${placedOrder.payment_method} (${placedOrder.fulfillment_type})`,
+            receiptNumber: null
+          });
+        }
+      } catch (err) {
+        showToast('Network error submitting order', 'error');
+        btn.disabled = false;
+        updatePaymentMethodSelection(payment_method);
+      }
+    }
+
+    async function initiateMpesaPayment(orderId, phone, amount, customerName = "") {
+      activeOrderId = orderId;
+      activeMpesaPhone = phone;
+      activeCustomerName = customerName;
+
+      // Populate waiting modal
+      $('mpesa-wait-order-id').textContent = `#${orderId}`;
+      $('mpesa-wait-amount').textContent = fmt(amount);
+      $('mpesa-wait-phone').textContent = phone;
+      $('mpesa-wait-status-text').textContent = 'Sending M-Pesa prompt to phone…';
+      $('mpesa-countdown-text').textContent = 'Connecting to Safaricom Daraja…';
+      $('mpesa-retry-container').classList.add('hidden');
+      $('mpesa-wait-status-box').classList.remove('hidden');
+      $('mpesa-cancel-bar').classList.remove('hidden');
+
+      openModal('mpesa-waiting-modal');
+      lucide.createIcons();
+
+      try {
+        const stkRes = await fetch(`${API}/payments/mpesa/stk-push`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, phoneNumber: phone })
+        });
+        const stkData = await stkRes.json();
+
+        if (!stkRes.ok) {
+          showMpesaError(stkData.error || 'Failed to initiate M-Pesa prompt.');
+          return;
+        }
+
+        activePaymentId = stkData.paymentId;
+        $('mpesa-wait-phone').textContent = stkData.phoneFormatted || phone;
+        $('mpesa-wait-status-text').textContent = 'Waiting for your M-Pesa PIN…';
+
+        // Start countdown & polling
+        startMpesaCountdown(45);
+        startPaymentPolling(activePaymentId, orderId, amount, customerName);
+      } catch (err) {
+        showMpesaError('Network error connecting to M-Pesa. Please check your connection.');
+      }
+    }
+
+    function startMpesaCountdown(seconds = 45) {
+      if (mpesaCountdownTimer) clearInterval(mpesaCountdownTimer);
+      let remaining = seconds;
+      const countEl = $('mpesa-countdown-text');
+      if (countEl) countEl.textContent = `Time remaining: ${remaining}s`;
+
+      mpesaCountdownTimer = setInterval(() => {
+        remaining--;
+        if (countEl) {
+          countEl.textContent = `Time remaining: ${remaining}s`;
+        }
+        if (remaining <= 0) {
+          clearInterval(mpesaCountdownTimer);
+          mpesaCountdownTimer = null;
+          if (activePaymentPoll) {
+            clearInterval(activePaymentPoll);
+            activePaymentPoll = null;
+          }
+          showMpesaError(`No response received from ${activeMpesaPhone || 'your phone'} (timed out). Please make sure your phone screen is unlocked and try again.`);
+        }
+      }, 1000);
+    }
+
+    function startPaymentPolling(paymentId, orderId, amount, customerName) {
+      if (activePaymentPoll) clearInterval(activePaymentPoll);
+      paymentPollStartTime = Date.now();
+
+      activePaymentPoll = setInterval(async () => {
+        try {
+          const res = await fetch(`${API}/payments/${paymentId}/status`);
+          if (!res.ok) return;
+
+          const data = await res.json();
+
+          // 1. Success!
+          if (data.status === 'paid') {
+            stopMpesaTimers();
+            closeModal('mpesa-waiting-modal');
+
+            // Clear cart
+            cart = [];
+            appliedPromo = null;
+            updateCartUI();
+
+            showOrderConfirmationModal({
+              id: orderId,
+              customer_name: data.customer_name || customerName || 'Valued Customer',
+              total: amount,
+              payment_method: 'M-Pesa (Paid)',
+              receiptNumber: data.receiptNumber
+            });
+            return;
+          }
+
+          // 2. Failed / Cancelled / Timeout
+          if (['failed', 'cancelled', 'timeout'].includes(data.status)) {
+            stopMpesaTimers();
+            const msg = data.status === 'cancelled'
+              ? 'Payment prompt was cancelled on phone.'
+              : (data.status === 'timeout'
+                ? `No response from ${activeMpesaPhone || 'your phone'} (timed out). Please verify the number and try again.`
+                : (data.resultDescription || 'M-Pesa payment could not be completed.'));
+            showMpesaError(msg);
+            return;
+          }
+        } catch (e) {
+          // Continue polling on transient fetch failure
+        }
+      }, 2500);
+    }
+
+    function stopMpesaTimers() {
+      if (activePaymentPoll) {
+        clearInterval(activePaymentPoll);
+        activePaymentPoll = null;
+      }
+      if (mpesaCountdownTimer) {
+        clearInterval(mpesaCountdownTimer);
+        mpesaCountdownTimer = null;
+      }
+    }
+
+    function showMpesaError(msg) {
+      stopMpesaTimers();
+      $('mpesa-wait-status-box').classList.add('hidden');
+      $('mpesa-cancel-bar').classList.add('hidden');
+      $('mpesa-retry-container').classList.remove('hidden');
+      $('mpesa-error-text-content').textContent = msg;
+      lucide.createIcons();
+    }
+
+    async function handleRetryMpesa() {
+      if (!activeOrderId) return;
+      $('mpesa-retry-container').classList.add('hidden');
+      $('mpesa-wait-status-box').classList.remove('hidden');
+      $('mpesa-cancel-bar').classList.remove('hidden');
+      $('mpesa-wait-status-text').textContent = 'Sending fresh M-Pesa prompt…';
+      $('mpesa-countdown-text').textContent = 'Connecting…';
+
+      try {
+        const res = await fetch(`${API}/payments/mpesa/retry`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: activeOrderId,
+            phoneNumber: activeMpesaPhone
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showMpesaError(data.error || 'Retry failed.');
+          return;
+        }
+
+        activePaymentId = data.paymentId;
+        $('mpesa-wait-phone').textContent = data.phoneFormatted || activeMpesaPhone;
+        $('mpesa-wait-status-text').textContent = 'Waiting for your M-Pesa PIN…';
+        startMpesaCountdown(45);
+        startPaymentPolling(activePaymentId, activeOrderId, data.amount, activeCustomerName);
+      } catch (err) {
+        showMpesaError('Network error retrying payment.');
+      }
+    }
+
+    async function handleCheckMpesaStatus() {
+      if (!activePaymentId) return;
+      try {
+        const res = await fetch(`${API}/payments/${activePaymentId}/status`);
+        const data = await res.json();
+        if (data.status === 'paid') {
+          stopMpesaTimers();
+          closeModal('mpesa-waiting-modal');
+          cart = [];
+          appliedPromo = null;
+          updateCartUI();
+
+          showOrderConfirmationModal({
+            id: activeOrderId,
+            customer_name: data.customer_name || activeCustomerName || 'Customer',
+            total: data.amount,
+            payment_method: 'M-Pesa (Paid)',
+            receiptNumber: data.receiptNumber
+          });
+        } else if (['failed', 'cancelled', 'timeout'].includes(data.status)) {
+          showMpesaError(data.resultDescription || `Payment is ${data.status}.`);
+        } else {
+          showToast(`Current status: ${data.status.toUpperCase()} — please enter your PIN on phone.`);
+        }
+      } catch (e) {
+        showToast('Unable to check payment status.');
+      }
+    }
+
+    async function handleCancelMpesaPrompt(reopenCheckout = false) {
+      stopMpesaTimers();
+
+      // Notify backend cancellation
+      if (activePaymentId || activeOrderId) {
+        fetch(`${API}/payments/mpesa/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId: activePaymentId, orderId: activeOrderId })
+        }).catch(() => {});
+      }
+
+      closeModal('mpesa-waiting-modal');
+
+      if (reopenCheckout) {
+        openCheckoutModal();
+        showToast('Payment prompt cancelled. You can change your number or choose another method.');
+      } else {
+        showToast('Payment cancelled.');
+      }
+    }
+
+    async function handleSwitchToCashOnDelivery() {
+      if (!activeOrderId) return;
+      stopMpesaTimers();
+      showToast('Switching order to Cash on Delivery…');
+
+      try {
+        const res = await fetch(`${API}/payments/switch-to-cod`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: activeOrderId })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Failed to switch payment method', 'error');
+          return;
+        }
+
+        closeModal('mpesa-waiting-modal');
+
+        // Clear cart
+        cart = [];
+        appliedPromo = null;
+        updateCartUI();
+
+        showOrderConfirmationModal({
+          id: activeOrderId,
+          customer_name: data.order?.customer_name || activeCustomerName || 'Customer',
+          total: data.order?.total || 0,
+          payment_method: 'Cash on Delivery (Pending)',
+          receiptNumber: null
+        });
+      } catch (e) {
+        showToast('Error switching payment method', 'error');
+      }
+    }
+
+    function showOrderConfirmationModal({ id, customer_name, total, payment_method, receiptNumber }) {
+      $('confirmed-order-id').textContent = `#${id}`;
+      $('confirmed-customer-name').textContent = customer_name;
+      $('confirmed-total').textContent = fmt(total);
+      $('confirmed-payment-method').textContent = payment_method;
+
+      const receiptRow = $('confirmed-receipt-row');
+      const receiptSpan = $('confirmed-receipt');
+      if (receiptNumber) {
+        receiptRow.classList.remove('hidden');
+        receiptSpan.textContent = receiptNumber;
+      } else {
+        receiptRow.classList.add('hidden');
+      }
+
+      const trackBtn = $('track-order-btn');
+      if (trackBtn) {
+        trackBtn.href = customerUser
+          ? '/store/account#orders'
+          : `/store/login?redirect=${encodeURIComponent('/store/account#orders')}`;
+      }
+
+      openModal('order-success-modal');
+      lucide.createIcons();
+    }
+
+    // ── Track Order ───────────────────────────────────────────────────────────
+    async function promptTrackOrder() {
+      const orderId = prompt("Enter your Dokani Order ID (e.g. DK-89210):");
+      if (!orderId) return;
+
+      try {
+        const res = await fetch(`${API}/orders/${orderId.trim()}`);
+        if (!res.ok) {
+          alert(`Order ${orderId} not found. Please verify your order number.`);
+          return;
+        }
+        const o = await res.json();
+        alert(`Order Status: ${o.order_status}\nCustomer: ${o.customer_name}\nTotal: ${fmt(o.total)}\nPayment: ${o.payment_method} (${o.payment_status})\nFulfillment: ${o.fulfillment_type}`);
+      } catch (e) {
+        alert("Unable to reach server. Please try again.");
+      }
+    }
+
+    // ── Load Customer Reviews ─────────────────────────────────────────────────
+    async function loadReviews() {
+      try {
+        const reviews = await fetch(`${API}/reviews?status=Approved`).then(r => r.json());
+        const grid = $('store-reviews-grid');
+        grid.innerHTML = reviews.map(r => `
+          <div class="bg-slate-50/70 p-6 rounded-3xl border border-slate-200/80 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-bold text-slate-900 text-xs">${r.customer_name}</div>
+                  <div class="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <i data-lucide="check" class="w-3 h-3"></i> Verified Buyer
+                  </div>
+                </div>
+                <div class="flex text-amber-400">
+                  ${'<i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>'.repeat(Math.round(r.rating || 5))}
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 leading-relaxed">"${r.comment}"</p>
+            </div>
+            <div class="pt-3 border-t border-slate-200/60 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>Item: ${r.product_name || 'Goods'}</span>
+              <span>${r.created_at.split(' ')[0]}</span>
+            </div>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) { console.error(e); }
+    }
+
+    // ── Customer Auth & Wishlist Integration ────────────────────────────────
+    async function checkCustomerAuth() {
+      try {
+        const res = await fetch(`${API}/customer/auth/me`);
+        if (res.ok) {
+          const data = await res.json();
+          customerUser = data.account;
+          const initial = (customerUser.name || 'U').charAt(0).toUpperCase();
+          $('customer-nav-container').innerHTML = `
+            <div class="flex items-center gap-2">
+              <a href="/store/account" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 transition-colors border border-indigo-200">
+                <div class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-black">${initial}</div>
+                <span class="max-w-[70px] sm:max-w-[110px] truncate">${customerUser.name.split(' ')[0]}</span>
+              </a>
+              <a href="/store/account" title="My Orders & Wishlist" class="hidden sm:inline-flex p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-slate-100 transition-colors border border-slate-200">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+              </a>
+            </div>
+          `;
+          lucide.createIcons();
+          await loadUserWishlist();
+        }
+      } catch (e) {
+        // Guest browsing
+      }
+    }
+
+    async function loadUserWishlist() {
+      if (!customerUser) return;
+      try {
+        const res = await fetch(`${API}/customer/wishlist`);
+        if (res.ok) {
+          const items = await res.json();
+          userWishlistIds = new Set(items.map(i => i.id));
+          renderProducts(allProducts);
+        }
+      } catch (e) {}
+    }
+
+    async function toggleWishlist(productId, e) {
+      if (e) e.stopPropagation();
+      if (!customerUser) {
+        window.location.href = '/store/login?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+      }
+
+      const isWishlisted = userWishlistIds.has(productId);
+      try {
+        if (isWishlisted) {
+          const res = await fetch(`${API}/customer/wishlist/${productId}`, { method: 'DELETE' });
+          if (res.ok) {
+            userWishlistIds.delete(productId);
+            showToast('Item removed from your wishlist', 'info');
+          }
+        } else {
+          const res = await fetch(`${API}/customer/wishlist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ product_id: productId })
+          });
+          if (res.ok) {
+            userWishlistIds.add(productId);
+            showToast('Added to your wishlist!', 'success');
+          }
+        }
+        renderProducts(allProducts);
+      } catch (err) {
+        showToast('Unable to update wishlist', 'error');
+      }
+    }
+
+    // ── Promo Code Copy ───────────────────────────────────────────────────────
+    function copyPromoCode(code) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast(`Code "${code}" copied! Paste it in your cart.`, 'success');
+        }).catch(() => {
+          showToast(`Promo code: ${code} — paste it in your cart!`, 'success');
+        });
+      } else {
+        const el = document.createElement('textarea');
+        el.value = code;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        showToast(`Code "${code}" copied! Paste it in your cart.`, 'success');
+      }
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    async function boot() {
+      lucide.createIcons();
+      updateCartUI();
+      await loadSettings();
+      await checkCustomerAuth();
+      await Promise.all([
+        loadCategories(),
+        loadProducts(),
+        loadReviews()
+      ]);
+
+      // Handle query param to open checkout immediately (e.g. from login redirect or reorder)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('checkout') === 'open') {
+        setTimeout(() => {
+          if (cart.length > 0) openCheckoutModal();
+        }, 400);
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>

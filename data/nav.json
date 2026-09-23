@@ -1,0 +1,30 @@
+{
+  "navMain": [
+    { "id": "dashboard", "label": "Dashboard", "icon": "layout-dashboard", "route": "dashboard", "active": true },
+    { 
+      "id": "ecommerce", 
+      "label": "Ecommerce", 
+      "icon": "shopping-bag", 
+      "route": "ecommerce", 
+      "hasArrow": true,
+      "subItems": [
+        { "id": "products", "label": "Products Catalog", "route": "products" },
+        { "id": "orders-view", "label": "All Orders", "route": "orders-view" }
+      ]
+    },
+    { "id": "promotion", "label": "Promotion", "icon": "megaphone", "route": "promotion" },
+    { "id": "customer", "label": "Customer", "icon": "users", "route": "customer" },
+    { "id": "messages", "label": "Message Center", "icon": "message-square", "route": "messages", "badgeKey": "messages" }
+  ],
+  "navProductEvent": [
+    { "id": "returns", "label": "Return Request", "icon": "rotate-ccw", "route": "returns", "badgeKey": "returnRequests" },
+    { "id": "calendar", "label": "Calendar", "icon": "calendar", "route": "calendar" },
+    { "id": "reviews", "label": "Product Review", "icon": "star", "route": "reviews" },
+    { "id": "bugs", "label": "Bug Report", "icon": "bug", "route": "bugs" }
+  ],
+  "navAccount": [
+    { "id": "help", "label": "Help & Support", "icon": "help-circle", "route": "help" },
+    { "id": "analytics", "label": "Analytics", "icon": "bar-chart-2", "route": "analytics" },
+    { "id": "settings", "label": "Settings", "icon": "settings", "route": "settings" }
+  ]
+}

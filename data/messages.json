@@ -1,0 +1,39 @@
+[
+  {
+    "id": "conv-1",
+    "customer": "Sarah Jenkins",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
+    "unread": true,
+    "lastMessage": "Hi! Can you confirm if my order has shipped yet?",
+    "time": "10:14 AM",
+    "messages": [
+      { "sender": "customer", "text": "Hello, I placed order #1023 yesterday.", "time": "10:12 AM" },
+      { "sender": "customer", "text": "Can you confirm if my order has shipped yet?", "time": "10:14 AM" }
+    ]
+  },
+  {
+    "id": "conv-2",
+    "customer": "Marcus Vance",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+    "unread": true,
+    "lastMessage": "Thanks for the quick reply, looking forward to it!",
+    "time": "Yesterday",
+    "messages": [
+      { "sender": "customer", "text": "Do you have the leather bag in olive green?", "time": "Yesterday, 3:15 PM" },
+      { "sender": "vendor", "text": "Hi Marcus! Yes, we have 4 units left in olive green.", "time": "Yesterday, 3:20 PM" },
+      { "sender": "customer", "text": "Thanks for the quick reply, looking forward to it!", "time": "Yesterday, 3:25 PM" }
+    ]
+  },
+  {
+    "id": "conv-3",
+    "customer": "Elena Rostova",
+    "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80",
+    "unread": false,
+    "lastMessage": "The package arrived in perfect condition. Thank you!",
+    "time": "2 days ago",
+    "messages": [
+      { "sender": "customer", "text": "The package arrived in perfect condition. Thank you!", "time": "Sep 09, 11:00 AM" },
+      { "sender": "vendor", "text": "You're most welcome Elena! Enjoy your purchase!", "time": "Sep 09, 11:30 AM" }
+    ]
+  }
+]

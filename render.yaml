@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: dokani-ecommerce
+    runtime: node
+    plan: free
+    region: frankfurt # Or oregon, ohio, singapore
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TIDB_HOST
+        value: gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+      - key: TIDB_PORT
+        value: "4000"
+      - key: TIDB_USER
+        value: 4WejAStBArqicGX.root
+      - key: TIDB_PASSWORD
+        sync: false # Set in Render Dashboard under Environment Variables
+      - key: TIDB_DATABASE
+        value: dokani
+      - key: TIDB_ENABLE_SSL
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CUSTOMER_JWT_SECRET
+        generateValue: true
+      - key: PAYMENT_ENCRYPTION_SECRET
+        generateValue: true

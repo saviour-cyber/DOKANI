@@ -1,0 +1,26 @@
+[
+  {
+    "id": "BUG-101",
+    "title": "Stripe webhook duplicate event on subscription renewal",
+    "severity": "Medium",
+    "status": "In Progress",
+    "reportedDate": "Sep 05, 2026",
+    "reporter": "Dev Team"
+  },
+  {
+    "id": "BUG-102",
+    "title": "Mobile safari date picker overlap in checkout",
+    "severity": "Low",
+    "status": "Resolved",
+    "reportedDate": "Aug 29, 2026",
+    "reporter": "QA"
+  },
+  {
+    "id": "BUG-103",
+    "title": "CSV order export encoding issue with special characters",
+    "severity": "High",
+    "status": "Open",
+    "reportedDate": "Sep 10, 2026",
+    "reporter": "Operations"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "CUST-101",
+    "name": "Sarah Jenkins",
+    "email": "sarah.j@example.com",
+    "phone": "+1 (555) 234-5678",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80",
+    "totalOrders": 12,
+    "totalSpent": 1420.50,
+    "status": "VIP",
+    "joinDate": "Jan 15, 2025"
+  },
+  {
+    "id": "CUST-102",
+    "name": "Marcus Vance",
+    "email": "marcus.v@example.com",
+    "phone": "+1 (555) 345-6789",
+    "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80",
+    "totalOrders": 5,
+    "totalSpent": 640.00,
+    "status": "Active",
+    "joinDate": "Mar 04, 2025"
+  },
+  {
+    "id": "CUST-103",
+    "name": "Elena Rostova",
+    "email": "elena.r@example.com",
+    "phone": "+44 20 7946 0912",
+    "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80",
+    "totalOrders": 8,
+    "totalSpent": 980.25,
+    "status": "VIP",
+    "joinDate": "Nov 22, 2024"
+  },
+  {
+    "id": "CUST-104",
+    "name": "David Chen",
+    "email": "david.chen@example.com",
+    "phone": "+1 (555) 876-5432",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
+    "totalOrders": 2,
+    "totalSpent": 175.00,
+    "status": "Active",
+    "joinDate": "May 19, 2025"
+  },
+  {
+    "id": "CUST-105",
+    "name": "Amira Al-Mansoor",
+    "email": "amira.m@example.com",
+    "phone": "+971 4 321 4567",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+    "totalOrders": 1,
+    "totalSpent": 89.50,
+    "status": "Inactive",
+    "joinDate": "Aug 10, 2025"
+  }
+]

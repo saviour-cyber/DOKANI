@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dokani Admin Portal — Single-Business Ecommerce</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .skeleton { background: linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .sidebar-transition { transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased flex min-h-screen overflow-x-hidden relative">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
+
+  <!-- Mobile Backdrop Overlay -->
+  <div id="mobile-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden md:hidden transition-opacity"></div>
+
+  <!-- ── SIDEBAR ───────────────────────────────────────────────────────────── -->
+  <aside id="sidebar" class="sidebar-transition w-64 bg-white border-r border-slate-200 flex flex-col justify-between flex-shrink-0 fixed inset-y-0 left-0 z-40 md:static -translate-x-full md:translate-x-0">
+    <div class="flex flex-col h-full overflow-y-auto">
+      <!-- Logo & Store Identifier -->
+      <div class="p-5 flex items-center justify-between border-b border-slate-100 min-h-[73px]">
+        <div class="flex items-center gap-2.5 overflow-hidden cursor-pointer" onclick="navigateTo('dashboard')">
+          <div class="bg-indigo-600 text-white font-black text-xl w-9 h-9 rounded-xl flex items-center justify-center shadow-md shadow-indigo-100 flex-shrink-0">d</div>
+          <div class="flex flex-col">
+            <span id="sidebar-brand-name" class="font-bold text-lg text-slate-900 tracking-tight whitespace-nowrap leading-none">Dokani</span>
+            <span class="text-[10px] font-bold text-indigo-600 tracking-wider uppercase mt-1">Admin Portal</span>
+          </div>
+        </div>
+        <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" title="Toggle Sidebar" class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+          <i id="sidebar-toggle-icon" data-lucide="panel-left-close" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Navigation container -->
+      <nav id="sidebar-nav" class="p-4 space-y-6 flex-1">
+        <!-- Skeleton loader while fetching nav -->
+        <div class="space-y-2">
+          <div class="skeleton h-3 w-20 mb-3"></div>
+          <div class="skeleton h-9 w-full"></div>
+          <div class="skeleton h-9 w-full"></div>
+          <div class="skeleton h-9 w-full"></div>
+        </div>
+      </nav>
+
+      <!-- Admin Profile & Logout -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div class="flex items-center gap-3 mb-3 px-1">
+          <img id="user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" class="w-9 h-9 rounded-xl object-cover border border-slate-200 flex-shrink-0">
+          <div class="overflow-hidden">
+            <div id="user-name" class="text-xs font-bold text-slate-900 truncate">Dokani Admin</div>
+            <div id="user-role" class="text-[11px] text-slate-400 truncate">admin@dokani.co.ke</div>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold text-xs transition-colors border border-rose-100 bg-white">
+          <i data-lucide="log-out" class="w-3.5 h-3.5 flex-shrink-0"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT WRAPPER ────────────────────────────────────────────────── -->
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto min-h-screen">
+
+    <!-- Top Bar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 flex-1 max-w-lg">
+        <!-- Mobile hamburger -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <!-- Global search bar -->
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="global-search" oninput="handleGlobalSearch(this.value)" type="text" placeholder="Search orders, products, customers..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Store currency badge -->
+        <div class="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-700 bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl">
+          <i data-lucide="coins" class="w-3.5 h-3.5 text-amber-500"></i>
+          <span>Currency: KSh</span>
+        </div>
+
+        <!-- Visit Storefront button -->
+        <a href="/store" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200/80 px-3 py-2 rounded-xl transition-colors">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span class="hidden sm:inline">Customer Storefront</span>
+        </a>
+
+        <!-- Notifications -->
+        <div class="relative">
+          <button onclick="toggleNotificationsMenu()" title="Notifications" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl relative transition-colors border border-slate-200">
+            <i data-lucide="bell" class="w-4 h-4"></i>
+            <span id="bell-dot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white"></span>
+          </button>
+
+          <!-- Notification Dropdown Popover -->
+          <div id="notifications-popover" class="hidden absolute right-0 top-11 w-80 bg-white border border-slate-200 rounded-2xl shadow-xl p-4 z-50">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span class="font-bold text-sm text-slate-900">Notifications</span>
+              <span id="notif-count-badge" class="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-2 py-0.5 rounded-full">Updates</span>
+            </div>
+            <div id="notifications-list" class="space-y-2.5 pt-3 text-xs">
+              <div class="text-slate-400 text-center py-4">No new notifications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Title & Header Info -->
+    <div class="px-4 sm:px-8 pt-6 pb-2">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="text-xs font-medium text-slate-400 flex items-center gap-1.5 mb-1">
+            <span>Dokani</span>
+            <span>/</span>
+            <span id="breadcrumb-current" class="text-indigo-600 font-semibold">Dashboard</span>
+          </div>
+          <h1 id="page-title" class="text-2xl font-black text-slate-900 tracking-tight">Store Overview</h1>
+          <p id="page-subtitle" class="text-xs text-slate-500 mt-0.5">Real-time performance metrics and operations for Dokani store.</p>
+        </div>
+        <div id="page-header-actions" class="flex items-center gap-2"></div>
+      </div>
+    </div>
+
+    <!-- ── DYNAMIC VIEW SECTIONS ─────────────────────────────────────────────── -->
+    <main class="p-4 sm:p-8 flex-1">
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: DASHBOARD                                                         -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-dashboard" class="view-section space-y-6">
+        <!-- TOP STATISTICS CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Today's Sales -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between text-slate-500 mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Today's Sales</span>
+              <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <i data-lucide="banknote" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="stat-today-sales" class="text-2xl font-black text-slate-900 tracking-tight">KSh 124,500</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs">
+              <span class="text-emerald-600 font-bold flex items-center"><i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>+12.5%</span>
+              <span class="text-slate-400">vs yesterday</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Orders -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between text-slate-500 mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Orders</span>
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="stat-orders" class="text-2xl font-black text-slate-900 tracking-tight">128</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs">
+              <span class="text-emerald-600 font-bold flex items-center"><i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>+8.2%</span>
+              <span class="text-slate-400">vs yesterday</span>
+            </div>
+          </div>
+
+          <!-- Card 3: Customers -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between text-slate-500 mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Customers</span>
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                <i data-lucide="users" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="stat-customers" class="text-2xl font-black text-slate-900 tracking-tight">1,240</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs">
+              <span class="text-emerald-600 font-bold flex items-center"><i data-lucide="trending-up" class="w-3.5 h-3.5 mr-0.5"></i>+5.4%</span>
+              <span class="text-slate-400">new buyers</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Products -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="navigateTo('inventory')">
+            <div class="flex items-center justify-between text-slate-500 mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Products</span>
+              <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+                <i data-lucide="package" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="stat-products" class="text-2xl font-black text-slate-900 tracking-tight">245</div>
+            <div class="flex items-center gap-1.5 mt-2 text-xs">
+              <span id="stat-low-stock-alert" class="text-amber-600 font-bold flex items-center bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i> 12 low stock
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS SECTION -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quick Actions</div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <button onclick="openAddProductModal()" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 hover:bg-indigo-50 text-indigo-700 font-semibold text-xs transition-colors">
+              <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i>
+              <span>+ Add Product</span>
+            </button>
+            <button onclick="navigateTo('orders')" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-white text-slate-700 font-semibold text-xs transition-colors">
+              <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-600"></i>
+              <span>View Orders</span>
+            </button>
+            <button onclick="navigateTo('inventory')" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-white text-slate-700 font-semibold text-xs transition-colors">
+              <i data-lucide="boxes" class="w-5 h-5 text-amber-600"></i>
+              <span>Manage Inventory</span>
+            </button>
+            <button onclick="openAddPromotionModal()" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-white text-slate-700 font-semibold text-xs transition-colors">
+              <i data-lucide="badge-percent" class="w-5 h-5 text-purple-600"></i>
+              <span>Create Promotion</span>
+            </button>
+            <button onclick="openAddCustomerModal()" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-white text-slate-700 font-semibold text-xs transition-colors">
+              <i data-lucide="user-plus" class="w-5 h-5 text-emerald-600"></i>
+              <span>Add Customer</span>
+            </button>
+            <button onclick="navigateTo('reports')" class="flex flex-col items-center justify-center gap-2 p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50 hover:bg-white text-slate-700 font-semibold text-xs transition-colors">
+              <i data-lucide="file-text" class="w-5 h-5 text-slate-600"></i>
+              <span>View Reports</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- LARGE SALES OVERVIEW SECTION -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sales Overview</div>
+              <div class="flex items-baseline gap-3 mt-1">
+                <span id="chart-total-revenue" class="text-3xl font-black text-slate-900 tracking-tight">KSh 1,245,000</span>
+                <span id="chart-total-orders" class="text-xs text-slate-500 font-semibold">954 orders</span>
+              </div>
+            </div>
+            <!-- Range Selection Buttons -->
+            <div id="chart-range-tabs" class="inline-flex bg-slate-100 p-1 rounded-xl gap-1 text-xs font-bold">
+              <button onclick="switchChartRange('today')" data-range="today" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors">Today</button>
+              <button onclick="switchChartRange('7days')" data-range="7days" class="px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition-colors">7 Days</button>
+              <button onclick="switchChartRange('30days')" data-range="30days" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors">30 Days</button>
+              <button onclick="switchChartRange('3months')" data-range="3months" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors">3 Months</button>
+              <button onclick="switchChartRange('12months')" data-range="12months" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors">12 Months</button>
+            </div>
+          </div>
+
+          <div class="relative h-72 sm:h-80 pt-6">
+            <canvas id="salesOverviewChart"></canvas>
+          </div>
+        </div>
+
+        <!-- RECENT STORE ORDERS -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-bold text-slate-900 text-base">Recent Customer Orders</h2>
+              <p class="text-xs text-slate-500">Live feed of orders placed through customer storefront</p>
+            </div>
+            <button onclick="navigateTo('orders')" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+              <span>View All</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 border-y border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Order ID</th>
+                  <th class="py-3 px-4">Customer</th>
+                  <th class="py-3 px-4">Items</th>
+                  <th class="py-3 px-4">Total</th>
+                  <th class="py-3 px-4">Payment</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-recent-orders-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="7" class="py-8 text-center text-slate-400">Loading recent orders…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: ORDERS MANAGEMENT                                                 -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-orders" class="view-section hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div class="flex items-center gap-2 overflow-x-auto" id="order-status-tabs">
+              <button onclick="filterOrdersByStatus('All')" data-status="All" class="order-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-colors">All Orders</button>
+              <button onclick="filterOrdersByStatus('Pending')" data-status="Pending" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Pending</button>
+              <button onclick="filterOrdersByStatus('Confirmed')" data-status="Confirmed" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Confirmed</button>
+              <button onclick="filterOrdersByStatus('Processing')" data-status="Processing" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Processing</button>
+              <button onclick="filterOrdersByStatus('Out for Delivery')" data-status="Out for Delivery" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Out for Delivery</button>
+              <button onclick="filterOrdersByStatus('Completed')" data-status="Completed" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Completed</button>
+              <button onclick="filterOrdersByStatus('Cancelled')" data-status="Cancelled" class="order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Cancelled</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="exportOrdersCsv()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 border-y border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3.5 px-4">Order ID</th>
+                  <th class="py-3.5 px-4">Customer</th>
+                  <th class="py-3.5 px-4">Date</th>
+                  <th class="py-3.5 px-4">Items</th>
+                  <th class="py-3.5 px-4">Total</th>
+                  <th class="py-3.5 px-4">Payment</th>
+                  <th class="py-3.5 px-4">Order Status</th>
+                  <th class="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-page-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="8" class="py-12 text-center text-slate-400">Loading orders…</td></tr>
+              </tbody>
+            </table>
+          </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: PAYMENTS (M-PESA TRANSACTIONS)                                   -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-payments" class="view-section hidden space-y-6">
+        <!-- 5 KPI Cards (Section 19) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Today's M-Pesa Sales</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="banknote" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="pay-stat-today" class="text-xl font-black text-slate-900 mt-2">KSh 0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Cleared today</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pending STK Push</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="pay-stat-pending" class="text-xl font-black text-amber-600 mt-2">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Awaiting PIN</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Successful</span>
+              <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="pay-stat-success" class="text-xl font-black text-slate-900 mt-2">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Completed transactions</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Failed / Cancelled</span>
+              <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="pay-stat-failed" class="text-xl font-black text-rose-600 mt-2">0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">Cancelled or timed out</div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total M-Pesa Revenue</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+              </div>
+            </div>
+            <div id="pay-stat-revenue" class="text-xl font-black text-emerald-700 mt-2">KSh 0</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">All-time M-Pesa earnings</div>
+          </div>
+        </div>
+
+        <!-- Payments Table Section -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <!-- Filter Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto" id="payment-status-tabs">
+              <button onclick="filterPaymentsByStatus('All')" data-status="All" class="payment-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-colors">All Transactions</button>
+              <button onclick="filterPaymentsByStatus('Paid')" data-status="Paid" class="payment-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Paid</button>
+              <button onclick="filterPaymentsByStatus('Pending')" data-status="Pending" class="payment-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Pending</button>
+              <button onclick="filterPaymentsByStatus('Failed')" data-status="Failed" class="payment-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Failed</button>
+              <button onclick="filterPaymentsByStatus('Cancelled')" data-status="Cancelled" class="payment-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">Cancelled</button>
+            </div>
+
+            <!-- Search -->
+            <div class="relative w-full sm:w-72">
+              <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input id="payments-search-input" oninput="handlePaymentsSearch(this.value)" type="text" placeholder="Search receipt, order, phone…" class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+          </div>
+
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 border-y border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3.5 px-4">Transaction ID</th>
+                  <th class="py-3.5 px-4">Order</th>
+                  <th class="py-3.5 px-4">Customer</th>
+                  <th class="py-3.5 px-4">Phone</th>
+                  <th class="py-3.5 px-4">Amount</th>
+                  <th class="py-3.5 px-4">Method</th>
+                  <th class="py-3.5 px-4">M-Pesa Receipt</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4">Date</th>
+                  <th class="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payments-page-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="10" class="py-12 text-center text-slate-400">Loading payments…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: PRODUCTS MANAGEMENT                                               -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-products" class="view-section hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-2 overflow-x-auto" id="product-category-filters">
+            <button onclick="filterProductsByCategory('All')" class="cat-pill active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white">All Categories</button>
+          </div>
+          <button onclick="openAddProductModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100 flex-shrink-0">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Product
+          </button>
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Products will render here -->
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: CATEGORIES                                                        -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-categories" class="view-section hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-slate-500">Categories organize your catalog on the customer storefront.</p>
+          <button onclick="openAddCategoryModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add Category
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3.5 px-4">Icon</th>
+                <th class="py-3.5 px-4">Category Name</th>
+                <th class="py-3.5 px-4">Slug</th>
+                <th class="py-3.5 px-4">Products</th>
+                <th class="py-3.5 px-4">Order</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="categories-tbody" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="py-10 text-center text-slate-400">Loading categories…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: INVENTORY                                                         -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-inventory" class="view-section hidden space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+            <div class="text-xs font-bold text-slate-400 uppercase">Stock Valuation</div>
+            <div id="inv-total-value" class="text-2xl font-black text-slate-900 mt-1">KSh 0</div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+            <div class="text-xs font-bold text-slate-400 uppercase">Total Units</div>
+            <div id="inv-total-units" class="text-2xl font-black text-slate-900 mt-1">0</div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+            <div class="text-xs font-bold text-amber-600 uppercase">Low Stock Products</div>
+            <div id="inv-low-count" class="text-2xl font-black text-amber-600 mt-1">0</div>
+          </div>
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+            <div class="text-xs font-bold text-rose-600 uppercase">Out of Stock</div>
+            <div id="inv-out-count" class="text-2xl font-black text-rose-600 mt-1">0</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-900 text-sm">Product Stock Levels</h3>
+            <span class="text-xs text-slate-400">Click Adjust Stock to record increases or adjustments</span>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3.5 px-4">Product</th>
+                <th class="py-3.5 px-4">SKU</th>
+                <th class="py-3.5 px-4">Category</th>
+                <th class="py-3.5 px-4">Stock on Hand</th>
+                <th class="py-3.5 px-4">Threshold</th>
+                <th class="py-3.5 px-4">Stock Value</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody" class="divide-y divide-slate-100">
+              <tr><td colspan="8" class="py-10 text-center text-slate-400">Loading inventory…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: CUSTOMERS                                                         -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-customers" class="view-section hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Customer Directory</h3>
+              <p class="text-xs text-slate-400">Directory of registered shoppers and order counts</p>
+            </div>
+            <button onclick="openAddCustomerModal()" class="px-3.5 py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 transition-colors">
+              + Add Customer
+            </button>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3.5 px-4">Customer Name</th>
+                <th class="py-3.5 px-4">Phone Number</th>
+                <th class="py-3.5 px-4">Email</th>
+                <th class="py-3.5 px-4">Orders</th>
+                <th class="py-3.5 px-4">Total Spent</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customers-tbody" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="py-10 text-center text-slate-400">Loading customers…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: PROMOTIONS                                                        -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-promotions" class="view-section hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <p class="text-xs text-slate-500">Discount codes configured here can be entered at the customer checkout.</p>
+          <button onclick="openAddPromotionModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100">
+            <i data-lucide="plus" class="w-4 h-4"></i> Create Promotion
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3.5 px-4">Coupon Code</th>
+                <th class="py-3.5 px-4">Discount</th>
+                <th class="py-3.5 px-4">Description</th>
+                <th class="py-3.5 px-4">Min. Spend</th>
+                <th class="py-3.5 px-4">Expires</th>
+                <th class="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="promotions-tbody" class="divide-y divide-slate-100">
+              <tr><td colspan="6" class="py-10 text-center text-slate-400">Loading promotions…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: RETURNS                                                           -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-returns" class="view-section hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-slate-100">
+            <h3 class="font-bold text-slate-900 text-sm">Customer Return Requests</h3>
+            <p class="text-xs text-slate-400">Manage item return approvals and refund tracking</p>
+          </div>
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[10px]">
+              <tr>
+                <th class="py-3.5 px-4">Return ID</th>
+                <th class="py-3.5 px-4">Order ID</th>
+                <th class="py-3.5 px-4">Customer</th>
+                <th class="py-3.5 px-4">Product</th>
+                <th class="py-3.5 px-4">Reason</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="returns-tbody" class="divide-y divide-slate-100">
+              <tr><td colspan="7" class="py-10 text-center text-slate-400">Loading returns…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: REVIEWS                                                           -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-reviews" class="view-section hidden space-y-6">
+        <div id="reviews-list" class="space-y-4">
+          <div class="py-12 text-center text-slate-400">Loading customer reviews…</div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: REPORTS                                                           -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-reports" class="view-section hidden space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-400 uppercase">Sales Orders Report</div>
+              <p class="text-xs text-slate-500 mt-1">Complete record of orders, customer details, and payment statuses.</p>
+            </div>
+            <button onclick="window.open('/api/reports/export?type=sales')" class="mt-4 w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Orders CSV
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-400 uppercase">Product Performance</div>
+              <p class="text-xs text-slate-500 mt-1">Product list with unit prices, sales volume, and current stock value.</p>
+            </div>
+            <button onclick="window.open('/api/reports/export?type=products')" class="mt-4 w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Products CSV
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-400 uppercase">Customer Directory</div>
+              <p class="text-xs text-slate-500 mt-1">Shopper lifetime spend, contact information, and order totals.</p>
+            </div>
+            <button onclick="window.open('/api/reports/export?type=customers')" class="mt-4 w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Customers CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+          <h3 class="font-bold text-slate-900 text-sm mb-4">Top 5 Best-Selling Products</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Product</th>
+                  <th class="py-3 px-4">SKU</th>
+                  <th class="py-3 px-4">Category</th>
+                  <th class="py-3 px-4">Units Sold</th>
+                  <th class="py-3 px-4">Gross Revenue</th>
+                </tr>
+              </thead>
+              <tbody id="reports-bestsellers-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="py-6 text-center text-slate-400">Loading best-sellers…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: SETTINGS                                                          -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-settings" class="view-section hidden space-y-6">
+        <form onsubmit="handleSaveSettings(event)" class="space-y-6">
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm border-b border-slate-100 pb-3">Store Information</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Store Name</label>
+                <input id="set-store-name" type="text" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Currency</label>
+                <input id="set-currency" type="text" value="KSh" readonly class="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-700">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Contact Phone</label>
+                <input id="set-phone" type="text" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Contact Email</label>
+                <input id="set-email" type="email" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Physical Business Address</label>
+                <input id="set-address" type="text" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm border-b border-slate-100 pb-3">Delivery & Shipping Fees (Kenya)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Standard Delivery Fee (KSh)</label>
+                <input id="set-delivery-fee" type="number" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Free Delivery Threshold (KSh)</label>
+                <input id="set-free-threshold" type="number" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-4">
+            <h3 class="font-bold text-slate-900 text-sm border-b border-slate-100 pb-3">Payment Methods Configuration</h3>
+            <div class="space-y-3 text-xs">
+              <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
+                <input id="set-mpesa" type="checkbox" class="rounded text-indigo-600 w-4 h-4">
+                <div>
+                  <span class="font-bold text-slate-800">M-Pesa Express / Till</span>
+                  <p class="text-[11px] text-slate-400">Accept direct mobile money payments via M-Pesa</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
+                <input id="set-cod" type="checkbox" class="rounded text-indigo-600 w-4 h-4">
+                <div>
+                  <span class="font-bold text-slate-800">Cash on Delivery</span>
+                  <p class="text-[11px] text-slate-400">Customers pay upon parcel arrival or pickup</p>
+                </div>
+              </label>
+              <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
+                <input id="set-card" type="checkbox" class="rounded text-indigo-600 w-4 h-4">
+                <div>
+                  <span class="font-bold text-slate-800">Debit / Credit Cards (Visa & Mastercard)</span>
+                  <p class="text-[11px] text-slate-400">Secure card checkout</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- M-Pesa Safaricom Gateway Settings (Section 3, 5, 6, 20, 21) -->
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="font-bold text-slate-900 text-sm">Safaricom Daraja M-Pesa Gateway</h3>
+                  <span id="mpesa-config-status-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200">
+                    ● Loading…
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Configure live STK Push credentials, business shortcodes, and callback webhooks.</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="handleTestMpesaConnection()" id="btn-test-mpesa" class="px-3.5 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm">
+                  <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                  <span>Test Connection</span>
+                </button>
+                <button type="button" onclick="handleSaveMpesaConfig()" id="btn-save-mpesa" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors shadow-sm shadow-emerald-100">
+                  Save M-Pesa
+                </button>
+              </div>
+            </div>
+
+            <!-- Test Connection Result Notification -->
+            <div id="mpesa-test-alert" class="hidden p-3 rounded-xl text-xs font-medium border flex items-center justify-between">
+              <span id="mpesa-test-msg">—</span>
+              <button type="button" onclick="$('mpesa-test-alert').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 ml-3">✕</button>
+            </div>
+
+            <!-- Production Warning (Section 21) -->
+            <div id="mpesa-prod-warning" class="hidden p-3 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-medium flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+              <span><strong>Warning:</strong> Production M-Pesa payments will charge real customer accounts. Verify your Daraja Go-Live credentials before processing live sales.</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Environment</label>
+                <select id="mpesa-set-env" onchange="onMpesaEnvChange(this.value)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800">
+                  <option value="sandbox">Sandbox (Development / Testing)</option>
+                  <option value="production">Production (Real Payments)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Account Type</label>
+                <select id="mpesa-set-account-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800">
+                  <option value="PayBill">PayBill</option>
+                  <option value="Till">Till Number (Buy Goods)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Business Shortcode</label>
+                <input id="mpesa-set-shortcode" type="text" placeholder="e.g. 174379" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold">
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-1">
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Consumer Key</label>
+                <input id="mpesa-set-consumer-key" type="text" placeholder="Daraja Consumer Key" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Consumer Secret</label>
+                <input id="mpesa-set-consumer-secret" type="password" placeholder="••••••••••••••••" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Encrypted at rest. Leave blank to keep existing.</span>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Passkey</label>
+                <input id="mpesa-set-passkey" type="password" placeholder="••••••••••••••••" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Encrypted at rest. Leave blank to keep existing.</span>
+              </div>
+
+              <div class="sm:col-span-2 lg:col-span-3">
+                <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1">Callback Webhook URL</label>
+                <input id="mpesa-set-callback-url" type="url" placeholder="https://yourdomain.com/api/payments/mpesa/callback" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Safaricom posts STK Push payment results to this public URL.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md shadow-indigo-100 transition-colors">
+              Save Settings
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- VIEW: ANALYTICS                                                         -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="view-analytics" class="view-section hidden space-y-6">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-sm mb-4">Monthly Revenue Growth (KSh)</h3>
+          <div class="relative h-80">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ── MODALS ─────────────────────────────────────────────────────────────── -->
+
+  <!-- Add Product Modal -->
+  <div id="modal-add-product" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-900 text-base">Add New Product</h3>
+        <button onclick="closeModal('modal-add-product')" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleAddProductSubmit(event)" class="mt-4 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Product Name *</label>
+          <input id="new-prod-name" required placeholder="e.g. Mount Kenya AA Coffee Beans" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Category *</label>
+            <select id="new-prod-category" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">SKU (Auto or Custom)</label>
+            <input id="new-prod-sku" placeholder="DK-1049" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs uppercase">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Price (KSh) *</label>
+            <input id="new-prod-price" type="number" step="0.01" required placeholder="2499" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Sale Price (KSh, optional)</label>
+            <input id="new-prod-sale-price" type="number" step="0.01" placeholder="1999" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Stock Quantity *</label>
+            <input id="new-prod-stock" type="number" required value="25" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Low Stock Alert Level</label>
+            <input id="new-prod-low-threshold" type="number" value="5" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Image URL</label>
+          <input id="new-prod-image" placeholder="https://images.unsplash.com/..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Description</label>
+          <textarea id="new-prod-desc" rows="2" placeholder="Product details and specifications..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs"></textarea>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <input id="new-prod-featured" type="checkbox" class="rounded text-indigo-600">
+          <label for="new-prod-featured" class="text-xs font-semibold text-slate-700">Mark as Featured on Homepage</label>
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-add-product')" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Adjust Stock Modal -->
+  <div id="modal-adjust-stock" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <h3 class="font-bold text-slate-900 text-base mb-1">Adjust Inventory Stock</h3>
+      <p id="adjust-prod-name" class="text-xs text-slate-500 mb-4">—</p>
+      <form onsubmit="handleAdjustStockSubmit(event)" class="space-y-3 text-xs">
+        <input id="adjust-prod-id" type="hidden">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Action</label>
+          <select id="adjust-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+            <option value="Increase">Increase Stock (+)</option>
+            <option value="Decrease">Decrease Stock (-)</option>
+            <option value="Set">Set Exact Quantity (=)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Quantity</label>
+          <input id="adjust-qty" type="number" required min="1" value="10" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Reason / Note</label>
+          <input id="adjust-reason" placeholder="Restock from warehouse, recount, etc." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-adjust-stock')" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm">Save Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Detail Modal -->
+  <div id="modal-order-detail" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 id="modal-order-id" class="font-bold text-slate-900 text-base">Order #—</h3>
+          <p id="modal-order-date" class="text-xs text-slate-400 mt-0.5">—</p>
+        </div>
+        <button onclick="closeModal('modal-order-detail')" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div id="modal-order-body" class="mt-4 space-y-4 text-xs">
+        <!-- Order info will render here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Detail Modal (Section 16, 17) -->
+  <div id="modal-payment-detail" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 id="modal-pay-id" class="font-bold text-slate-900 text-base">Payment #—</h3>
+          <p id="modal-pay-sub" class="text-xs text-slate-400 mt-0.5">—</p>
+        </div>
+        <button onclick="closeModal('modal-payment-detail')" class="p-1 text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div id="modal-pay-body" class="mt-4 space-y-4 text-xs">
+        <!-- Payment details render here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div id="modal-add-category" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <h3 class="font-bold text-slate-900 text-base mb-3">Add Product Category</h3>
+      <form onsubmit="handleAddCategorySubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Category Name *</label>
+          <input id="new-cat-name" required placeholder="e.g. Fitness Gear" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Description</label>
+          <input id="new-cat-desc" placeholder="Category summary" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-add-category')" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm">Add Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Promotion Modal -->
+  <div id="modal-add-promotion" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200">
+      <h3 class="font-bold text-slate-900 text-base mb-3">Create Promotion Coupon</h3>
+      <form onsubmit="handleAddPromotionSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Coupon Code *</label>
+          <input id="new-promo-code" required placeholder="SUMMER30" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl uppercase font-mono font-bold">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Type</label>
+            <select id="new-promo-type" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+              <option value="Percentage">Percentage (%)</option>
+              <option value="Fixed">Fixed Amount (KSh)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Value *</label>
+            <input id="new-promo-val" type="number" required placeholder="20" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold">
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Min. Order Spend (KSh)</label>
+          <input id="new-promo-min" type="number" placeholder="2000" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Description</label>
+          <input id="new-promo-desc" placeholder="20% off footwear & apparel" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeModal('modal-add-promotion')" class="px-4 py-2 text-slate-600 font-bold hover:bg-slate-100 rounded-xl">Cancel</button>
+          <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm">Create Coupon</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── APP SCRIPT ─────────────────────────────────────────────────────────── -->
+  <script>
+    const API = '/api';
+    let currentRoute = 'dashboard';
+    let salesChartInstance = null;
+    let analyticsChartInstance = null;
+    let cachedProducts = [];
+    let cachedCategories = [];
+    let cachedOrders = [];
+
+    const $ = id => document.getElementById(id);
+    const fmt = n => 'KSh ' + Number(n || 0).toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+    function showToast(msg, type = 'success') {
+      const c = $('toast-container');
+      const t = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-600 text-white shadow-emerald-200',
+        error: 'bg-rose-600 text-white shadow-rose-200',
+        info: 'bg-indigo-600 text-white shadow-indigo-200'
+      };
+      t.className = `${colors[type] || colors.success} text-xs font-bold px-4 py-3 rounded-xl shadow-lg pointer-events-auto flex items-center gap-2 transition-all transform translate-y-2 opacity-0`;
+      t.innerHTML = `<span>${msg}</span>`;
+      c.appendChild(t);
+      setTimeout(() => { t.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+      setTimeout(() => {
+        t.classList.add('opacity-0');
+        setTimeout(() => t.remove(), 300);
+      }, 3500);
+    }
+
+    function openModal(id) { $(id).classList.remove('hidden'); }
+    function closeModal(id) { $(id).classList.add('hidden'); }
+
+    function toggleMobileSidebar() {
+      const s = $('sidebar');
+      const b = $('mobile-backdrop');
+      s.classList.toggle('-translate-x-full');
+      b.classList.toggle('hidden');
+    }
+
+    function toggleSidebarCollapse() {
+      // Toggle compact sidebar
+      $('sidebar').classList.toggle('w-64');
+      $('sidebar').classList.toggle('w-20');
+    }
+
+    function toggleNotificationsMenu() {
+      $('notifications-popover').classList.toggle('hidden');
+    }
+
+    // ── Routes Config ─────────────────────────────────────────────────────────
+    const routesConfig = {
+      'dashboard': {
+        title: 'Store Overview',
+        subtitle: 'Real-time performance metrics and operations for Dokani store.',
+        loader: () => { loadStats(); initSalesOverviewChart('7days'); loadDashboardRecentOrders(); }
+      },
+      'orders': {
+        title: 'Order Management',
+        subtitle: 'Track, fulfill, update statuses, and print invoices for customer orders.',
+        loader: () => loadOrdersPage()
+      },
+      'payments': {
+        title: 'M-Pesa Payment Transactions',
+        subtitle: 'Track Safaricom STK Push transactions, receipts, status filters, and revenue.',
+        loader: () => loadPaymentsPage()
+      },
+      'products': {
+        title: 'Product Catalog',
+        subtitle: 'Manage products, prices, stock levels, and store visibility.',
+        loader: () => { loadCategoriesDropdown(); loadProductsPage(); }
+      },
+      'categories': {
+        title: 'Product Categories',
+        subtitle: 'Organize your store collections for customers on the storefront.',
+        loader: () => loadCategoriesPage()
+      },
+      'inventory': {
+        title: 'Inventory & Stock Control',
+        subtitle: 'Monitor stock on hand, low-stock warnings, and record adjustments.',
+        loader: () => loadInventoryPage()
+      },
+      'customers': {
+        title: 'Customer Directory',
+        subtitle: 'View customer accounts, contact details, and spending history.',
+        loader: () => loadCustomersPage()
+      },
+      'promotions': {
+        title: 'Promotions & Coupons',
+        subtitle: 'Create discount codes for customer storefront checkout.',
+        loader: () => loadPromotionsPage()
+      },
+      'returns': {
+        title: 'Return Requests',
+        subtitle: 'Manage returns, item receipts, and refunds.',
+        loader: () => loadReturnsPage()
+      },
+      'reviews': {
+        title: 'Customer Reviews',
+        subtitle: 'Verified customer feedback and moderation.',
+        loader: () => loadReviewsPage()
+      },
+      'reports': {
+        title: 'Business Reports & Analytics',
+        subtitle: 'Export sales, products, and inventory data to CSV.',
+        loader: () => loadReportsPage()
+      },
+      'settings': {
+        title: 'Store Settings',
+        subtitle: 'Configure store credentials, currency, payment options, and delivery fees.',
+        loader: () => loadSettingsPage()
+      },
+      'analytics': {
+        title: 'Store Analytics',
+        subtitle: 'Monthly sales and order growth trajectory.',
+        loader: () => initAnalyticsChart()
+      }
+    };
+
+    function navigateTo(route, updateHistory = true) {
+      if (!routesConfig[route]) route = 'dashboard';
+      currentRoute = route;
+
+      // Update URL without page reload
+      if (updateHistory) {
+        history.pushState(null, '', route === 'dashboard' ? '/admin' : `/admin/${route}`);
+      }
+
+      // Update sidebar visual active state
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const linkRoute = link.getAttribute('data-route');
+        if (linkRoute === route) {
+          link.classList.remove('text-slate-600', 'hover:bg-slate-50', 'font-medium');
+          link.classList.add('bg-indigo-50', 'text-indigo-600', 'font-bold');
+        } else {
+          link.classList.remove('bg-indigo-50', 'text-indigo-600', 'font-bold');
+          link.classList.add('text-slate-600', 'hover:bg-slate-50', 'font-medium');
+        }
+      });
+
+      // Switch active view container
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.add('hidden'));
+      const targetView = $(`view-${route}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      // Update headers
+      const conf = routesConfig[route];
+      $('breadcrumb-current').textContent = conf.title.split(' ')[0];
+      $('page-title').textContent = conf.title;
+      $('page-subtitle').textContent = conf.subtitle;
+
+      // Close mobile drawer if open
+      $('sidebar').classList.add('-translate-x-full');
+      $('mobile-backdrop').classList.add('hidden');
+
+      // Trigger loader
+      if (conf.loader) conf.loader();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', () => {
+      resolveInitialRoute();
+    });
+
+    function resolveInitialRoute() {
+      const path = window.location.pathname.replace('/admin', '').replace('/', '');
+      if (path && routesConfig[path]) {
+        navigateTo(path, false);
+      } else {
+        navigateTo('dashboard', false);
+      }
+    }
+
+    // ── Build Sidebar Navigation ──────────────────────────────────────────────
+    async function buildNav() {
+      try {
+        const nav = await fetch(`${API}/nav`).then(r => r.json());
+        const sections = [
+          { title: 'MAIN',       items: nav.navMain },
+          { title: 'STORE',      items: nav.navStore },
+          { title: 'OPERATIONS', items: nav.navOperations },
+          { title: 'ANALYTICS',  items: nav.navAnalytics },
+          { title: 'SYSTEM',     items: nav.navSystem }
+        ];
+
+        $('sidebar-nav').innerHTML = sections.map(sec => `
+          <div>
+            <div class="px-3 text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">${sec.title}</div>
+            <ul class="space-y-1">
+              ${sec.items.map(item => `
+                <li>
+                  <a href="/admin/${item.route}" data-route="${item.route}" onclick="event.preventDefault(); navigateTo('${item.route}')" class="nav-link flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors text-slate-600 hover:bg-slate-50 font-medium">
+                    <i data-lucide="${item.icon}" class="w-4 h-4 flex-shrink-0"></i>
+                    <span class="truncate">${item.label}</span>
+                  </a>
+                </li>`).join('')}
+            </ul>
+          </div>`).join('');
+
+        lucide.createIcons();
+      } catch (e) {
+        console.error('Nav build error:', e);
+      }
+    }
+
+    // ── User / Admin Info ─────────────────────────────────────────────────────
+    async function loadUser() {
+      try {
+        const user = await fetch(`${API}/user`).then(r => r.json());
+        $('user-avatar').src = user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100';
+        $('user-name').textContent = user.name;
+        $('user-role').textContent = user.email;
+      } catch (e) { console.error('User load error:', e); }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch(`${API}/auth/logout`, { method: 'POST' });
+        window.location.href = '/admin/login';
+      } catch (e) {
+        window.location.href = '/admin/login';
+      }
+    }
+
+    // ── Load Stats (Dashboard Top Statistics) ──────────────────────────────────
+    async function loadStats() {
+      try {
+        const d = await fetch(`${API}/stats`).then(r => r.json());
+        $('stat-today-sales').textContent = fmt(d.stats.todaySales);
+        $('stat-orders').textContent = d.stats.todayOrders;
+        $('stat-customers').textContent = d.stats.totalCustomers.toLocaleString();
+        $('stat-products').textContent = d.stats.totalProducts;
+        $('stat-low-stock-alert').innerHTML = `<i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i> ${d.stats.lowStock} low stock`;
+        lucide.createIcons();
+      } catch (e) { console.error('Stats error:', e); }
+    }
+
+    // ── Sales Overview Chart ──────────────────────────────────────────────────
+    async function switchChartRange(range) {
+      document.querySelectorAll('#chart-range-tabs button').forEach(btn => {
+        if (btn.getAttribute('data-range') === range) {
+          btn.className = 'px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition-colors';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-colors';
+        }
+      });
+      initSalesOverviewChart(range);
+    }
+
+    async function initSalesOverviewChart(range = '7days') {
+      try {
+        const data = await fetch(`${API}/stats/chart?range=${range}`).then(r => r.json());
+        $('chart-total-revenue').textContent = fmt(data.summary.totalRevenue);
+        $('chart-total-orders').textContent = `${data.summary.totalOrders} orders (AOV: ${fmt(data.summary.averageOrderValue)})`;
+
+        const ctx = $('salesOverviewChart').getContext('2d');
+        if (salesChartInstance) salesChartInstance.destroy();
+
+        salesChartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: 'Revenue (KSh)',
+              data: data.revenue,
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.08)',
+              borderWidth: 2.5,
+              tension: 0.35,
+              fill: true,
+              pointBackgroundColor: '#4f46e5',
+              pointRadius: 4,
+              pointHoverRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => `Revenue: ${fmt(ctx.raw)}`
+                }
+              }
+            },
+            scales: {
+              y: {
+                grid: { color: '#f1f5f9' },
+                ticks: {
+                  callback: v => 'KSh ' + (v >= 1000 ? (v/1000) + 'k' : v)
+                }
+              },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      } catch (e) {
+        console.error('Chart load error:', e);
+      }
+    }
+
+    // ── Dashboard Recent Orders Table ─────────────────────────────────────────
+    async function loadDashboardRecentOrders() {
+      try {
+        const res = await fetch(`${API}/orders?page=1&limit=5`).then(r => r.json());
+        const tbody = $('dashboard-recent-orders-tbody');
+        if (!res.data || res.data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-400">No orders placed yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = res.data.map(o => `
+          <tr class="hover:bg-slate-50/50 transition-colors">
+            <td class="py-3 px-4 font-mono font-bold text-slate-900">${o.id}</td>
+            <td class="py-3 px-4 font-medium text-slate-900">${o.customer_name}</td>
+            <td class="py-3 px-4 text-slate-500">${o.itemCount} items</td>
+            <td class="py-3 px-4 font-bold text-slate-900">${fmt(o.total)}</td>
+            <td class="py-3 px-4 font-medium text-slate-600">${o.payment_method}</td>
+            <td class="py-3 px-4">${statusBadge(o.order_status)}</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="viewOrderDetail('${o.id}')" class="text-indigo-600 hover:text-indigo-800 font-bold">Details</button>
+            </td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) { console.error(e); }
+    }
+
+    function statusBadge(status) {
+      const colors = {
+        'Pending': 'bg-amber-50 text-amber-700 border-amber-200',
+        'Confirmed': 'bg-blue-50 text-blue-700 border-blue-200',
+        'Processing': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        'Ready for Pickup': 'bg-purple-50 text-purple-700 border-purple-200',
+        'Out for Delivery': 'bg-sky-50 text-sky-700 border-sky-200',
+        'Completed': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'Cancelled': 'bg-rose-50 text-rose-700 border-rose-200'
+      };
+      const cls = colors[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+      return `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold border ${cls}">${status}</span>`;
+    }
+
+    // ── Orders Management Page ────────────────────────────────────────────────
+    let currentOrderStatusFilter = 'All';
+    async function loadOrdersPage() {
+      try {
+        const url = currentOrderStatusFilter === 'All'
+          ? `${API}/orders?limit=50`
+          : `${API}/orders?status=${encodeURIComponent(currentOrderStatusFilter)}&limit=50`;
+        const res = await fetch(url).then(r => r.json());
+        cachedOrders = res.data || [];
+        renderOrdersTable(cachedOrders);
+      } catch (e) {
+        $('orders-page-tbody').innerHTML = '<tr><td colspan="8" class="py-10 text-center text-rose-500">Error loading orders</td></tr>';
+      }
+    }
+
+    function filterOrdersByStatus(status) {
+      currentOrderStatusFilter = status;
+      document.querySelectorAll('#order-status-tabs .order-tab').forEach(b => {
+        if (b.getAttribute('data-status') === status) {
+          b.className = 'order-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white';
+        } else {
+          b.className = 'order-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+        }
+      });
+      loadOrdersPage();
+    }
+
+    function renderOrdersTable(list) {
+      const tbody = $('orders-page-tbody');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-12 text-center text-slate-400">No orders matching criteria.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(o => `
+        <tr class="hover:bg-slate-50/60 transition-colors">
+          <td class="py-4 px-4 font-mono font-bold text-slate-900">${o.id}</td>
+          <td class="py-4 px-4">
+            <div class="font-bold text-slate-900">${o.customer_name}</div>
+            <div class="text-[11px] text-slate-400">${o.customer_phone}</div>
+          </td>
+          <td class="py-4 px-4 text-slate-500">${o.created_at.split(' ')[0]}</td>
+          <td class="py-4 px-4 text-slate-600 font-medium">${o.itemCount} items</td>
+          <td class="py-4 px-4 font-black text-slate-900">${fmt(o.total)}</td>
+          <td class="py-4 px-4">
+            <div class="font-medium text-slate-800">${o.payment_method}</div>
+            <span class="text-[10px] font-bold ${o.payment_status === 'Paid' ? 'text-emerald-600' : 'text-amber-600'}">${o.payment_status}</span>
+          </td>
+          <td class="py-4 px-4">${statusBadge(o.order_status)}</td>
+          <td class="py-4 px-4 text-right space-x-2">
+            <button onclick="viewOrderDetail('${o.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition-colors">Details</button>
+            <button onclick="window.open('${API}/orders/${o.id}/invoice')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-xs transition-colors">Invoice</button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    async function viewOrderDetail(id) {
+      try {
+        const o = await fetch(`${API}/orders/${id}`).then(r => r.json());
+        $('modal-order-id').textContent = `Order #${o.id}`;
+        $('modal-order-date').textContent = `Placed on ${o.created_at} • Status: ${o.order_status}`;
+
+        const itemsHtml = o.items.map(it => `
+          <div class="flex items-center justify-between py-2 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+              <img src="${it.product_image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100'}" class="w-10 h-10 rounded-lg object-cover bg-slate-100">
+              <div>
+                <div class="font-bold text-slate-900">${it.product_name}</div>
+                <div class="text-[11px] text-slate-400">Qty: ${it.quantity} × ${fmt(it.price)}</div>
+              </div>
+            </div>
+            <div class="font-bold text-slate-900">${fmt(it.total)}</div>
+          </div>
+        `).join('');
+
+        $('modal-order-body').innerHTML = `
+          <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80 space-y-1.5">
+            <div class="font-bold text-slate-900 text-xs">Customer Details:</div>
+            <div>Name: <strong>${o.customer_name}</strong></div>
+            <div>Phone: <strong>${o.customer_phone}</strong></div>
+            <div>Delivery Address: <strong>${o.delivery_address}</strong></div>
+            <div>Fulfillment: <strong>${o.fulfillment_type}</strong></div>
+            <div>Payment: <strong>${o.payment_method}</strong> (<span class="font-bold ${o.payment_status === 'Paid' ? 'text-emerald-600' : 'text-amber-600'}">${o.payment_status === 'Paid' ? '✓ Paid' : o.payment_status}</span>)</div>
+            ${o.payment?.phone_number ? `<div>Payment Phone: <strong>${o.payment.phone_number}</strong></div>` : ''}
+            ${(o.mpesa_receipt_number || o.payment?.mpesa_receipt_number) ? `
+              <div class="mt-1 p-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 font-medium text-xs">
+                M-Pesa Receipt: <strong class="font-mono font-black">${o.mpesa_receipt_number || o.payment?.mpesa_receipt_number}</strong>
+                ${o.payment?.transaction_date ? `<span class="text-[10px] text-emerald-600 ml-2">(${o.payment.transaction_date})</span>` : ''}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="space-y-1">
+            <div class="font-bold text-slate-900 text-xs mb-2">Order Items:</div>
+            ${itemsHtml}
+          </div>
+
+          <div class="space-y-1 pt-2 border-t border-slate-100 text-right">
+            <div>Subtotal: <strong>${fmt(o.subtotal)}</strong></div>
+            ${o.discount_amount > 0 ? `<div class="text-emerald-600">Discount: <strong>-${fmt(o.discount_amount)}</strong></div>` : ''}
+            <div>Delivery: <strong>${o.delivery_fee > 0 ? fmt(o.delivery_fee) : 'FREE'}</strong></div>
+            <div class="text-base font-black text-indigo-600 pt-1 border-t border-slate-200">Total: ${fmt(o.total)}</div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <label class="font-bold text-slate-700">Update Order Status:</label>
+              <select onchange="updateOrderStatus('${o.id}', this.value)" class="p-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold">
+                ${['Pending', 'Confirmed', 'Processing', 'Ready for Pickup', 'Out for Delivery', 'Completed', 'Cancelled'].map(s => `
+                  <option value="${s}" ${s === o.order_status ? 'selected' : ''}>${s}</option>
+                `).join('')}
+              </select>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <label class="font-bold text-slate-700">Update Payment Status:</label>
+              <select onchange="updatePaymentStatus('${o.id}', this.value)" class="p-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold">
+                ${['Pending', 'Paid', 'Failed', 'Refunded'].map(s => `
+                  <option value="${s}" ${s === o.payment_status ? 'selected' : ''}>${s}</option>
+                `).join('')}
+              </select>
+            </div>
+          </div>
+        `;
+
+        openModal('modal-order-detail');
+      } catch (e) {
+        showToast('Error loading order details', 'error');
+      }
+    }
+
+    async function updateOrderStatus(id, status) {
+      try {
+        const res = await fetch(`${API}/orders/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (res.ok) {
+          showToast(`Order #${id} status updated to ${status}`);
+          loadOrdersPage();
+          loadStats();
+        }
+      } catch (e) { showToast('Update failed', 'error'); }
+    }
+
+    async function updatePaymentStatus(id, payment_status) {
+      try {
+        const res = await fetch(`${API}/orders/${id}/payment`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_status })
+        });
+        if (res.ok) {
+          showToast(`Payment status updated to ${payment_status}`);
+          loadOrdersPage();
+          loadStats();
+        }
+      } catch (e) { showToast('Payment update failed', 'error'); }
+    }
+
+    // ── Products Page ─────────────────────────────────────────────────────────
+    async function loadCategoriesDropdown() {
+      try {
+        const cats = await fetch(`${API}/categories`).then(r => r.json());
+        cachedCategories = cats;
+        const select = $('new-prod-category');
+        select.innerHTML = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+        const filtersContainer = $('product-category-filters');
+        filtersContainer.innerHTML = `
+          <button onclick="filterProductsByCategory('All')" class="cat-pill active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white">All Categories</button>
+          ${cats.map(c => `
+            <button onclick="filterProductsByCategory('${c.name}')" class="cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">${c.name}</button>
+          `).join('')}
+        `;
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadProductsPage(cat = 'All') {
+      try {
+        const url = cat === 'All' ? `${API}/products` : `${API}/products?category=${encodeURIComponent(cat)}`;
+        const list = await fetch(url).then(r => r.json());
+        cachedProducts = list;
+        renderProductsGrid(list);
+      } catch (e) {
+        $('products-grid').innerHTML = '<div class="col-span-full py-12 text-center text-rose-500">Error loading products</div>';
+      }
+    }
+
+    function filterProductsByCategory(cat) {
+      document.querySelectorAll('#product-category-filters .cat-pill').forEach(b => {
+        if (b.textContent.trim().startsWith(cat)) {
+          b.className = 'cat-pill active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white';
+        } else {
+          b.className = 'cat-pill px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200';
+        }
+      });
+      loadProductsPage(cat);
+    }
+
+    function renderProductsGrid(list) {
+      const grid = $('products-grid');
+      if (!list || list.length === 0) {
+        grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400">No products found. Click Add Product to create one.</div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(p => {
+        const isLow = p.stock <= p.low_stock_threshold && p.stock > 0;
+        const isOut = p.stock === 0;
+        const badgeCls = isOut ? 'bg-rose-50 text-rose-700 border-rose-200' : isLow ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 flex flex-col justify-between hover:shadow-md transition-shadow group">
+            <div>
+              <div class="relative overflow-hidden rounded-xl bg-slate-100 aspect-video mb-3">
+                <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                <span class="absolute top-2 right-2 border px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeCls} backdrop-blur-md bg-white/90">
+                  ${p.status} (${p.stock})
+                </span>
+                <span class="absolute bottom-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2 py-0.5 rounded-md text-[10px] font-mono font-medium">
+                  ${p.sku}
+                </span>
+              </div>
+              <div class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">${p.category_name}</div>
+              <h3 class="font-bold text-slate-900 text-sm mt-0.5 line-clamp-1">${p.name}</h3>
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 text-xs">
+                <div>
+                  <div class="text-[10px] text-slate-400 uppercase font-bold">Price</div>
+                  <div class="text-base font-black text-slate-900">${fmt(p.price)}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[10px] text-slate-400 uppercase font-bold">Sales</div>
+                  <div class="font-bold text-slate-700">${p.sales || 0} units</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100">
+              <button onclick="openAdjustStockModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 py-1.5 rounded-xl text-xs font-bold transition-colors">
+                Stock: ${p.stock}
+              </button>
+              <button onclick="deleteProduct('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors" title="Archive Product">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openAddProductModal() { openModal('modal-add-product'); }
+
+    async function handleAddProductSubmit(e) {
+      e.preventDefault();
+      const body = {
+        name: $('new-prod-name').value,
+        category_id: $('new-prod-category').value,
+        sku: $('new-prod-sku').value,
+        price: $('new-prod-price').value,
+        sale_price: $('new-prod-sale-price').value || null,
+        stock: $('new-prod-stock').value,
+        low_stock_threshold: $('new-prod-low-threshold').value,
+        image: $('new-prod-image').value,
+        description: $('new-prod-desc').value,
+        is_featured: $('new-prod-featured').checked
+      };
+
+      try {
+        const res = await fetch(`${API}/products`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showToast(data.error || 'Failed to create product', 'error');
+          return;
+        }
+
+        closeModal('modal-add-product');
+        e.target.reset();
+        showToast('Product added to catalog and storefront!');
+        loadProductsPage();
+        loadStats();
+      } catch (err) {
+        showToast('Network error adding product', 'error');
+      }
+    }
+
+    async function deleteProduct(id, name) {
+      if (!confirm(`Are you sure you want to archive "${name}"? It will no longer appear on the storefront.`)) return;
+      try {
+        const res = await fetch(`${API}/products/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast(`"${name}" archived.`);
+          loadProductsPage();
+          loadStats();
+        }
+      } catch (e) { showToast('Delete failed', 'error'); }
+    }
+
+    // ── Categories Page ───────────────────────────────────────────────────────
+    async function loadCategoriesPage() {
+      try {
+        const list = await fetch(`${API}/categories`).then(r => r.json());
+        const tbody = $('categories-tbody');
+        tbody.innerHTML = list.map(c => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3 px-4"><i data-lucide="${c.icon || 'tag'}" class="w-4 h-4 text-indigo-600"></i></td>
+            <td class="py-3 px-4 font-bold text-slate-900">${c.name}</td>
+            <td class="py-3 px-4 font-mono text-slate-500">${c.slug}</td>
+            <td class="py-3 px-4 font-medium text-slate-700">${c.product_count} products</td>
+            <td class="py-3 px-4 text-slate-500">${c.display_order}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${c.is_active ? 'Active' : 'Hidden'}</span></td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="deleteCategory('${c.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddCategoryModal() { openModal('modal-add-category'); }
+
+    async function handleAddCategorySubmit(e) {
+      e.preventDefault();
+      const name = $('new-cat-name').value;
+      const description = $('new-cat-desc').value;
+      try {
+        const res = await fetch(`${API}/categories`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description })
+        });
+        if (res.ok) {
+          closeModal('modal-add-category');
+          e.target.reset();
+          showToast('Category created!');
+          loadCategoriesPage();
+        }
+      } catch (err) { showToast('Error creating category', 'error'); }
+    }
+
+    async function deleteCategory(id) {
+      if (!confirm('Are you sure you want to delete this category?')) return;
+      try {
+        await fetch(`${API}/categories/${id}`, { method: 'DELETE' });
+        showToast('Category deleted');
+        loadCategoriesPage();
+      } catch (e) { showToast('Delete failed', 'error'); }
+    }
+
+    // ── Inventory Page ────────────────────────────────────────────────────────
+    async function loadInventoryPage() {
+      try {
+        const data = await fetch(`${API}/inventory`).then(r => r.json());
+        $('inv-total-value').textContent = fmt(data.summary.totalStockValue);
+        $('inv-total-units').textContent = data.summary.totalUnits.toLocaleString();
+        $('inv-low-count').textContent = data.summary.lowStockCount;
+        $('inv-out-count').textContent = data.summary.outOfStockCount;
+
+        const tbody = $('inventory-tbody');
+        tbody.innerHTML = data.products.map(p => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3 px-4 font-bold text-slate-900">${p.name}</td>
+            <td class="py-3 px-4 font-mono text-slate-500">${p.sku}</td>
+            <td class="py-3 px-4 text-slate-600">${p.category_name}</td>
+            <td class="py-3 px-4 font-black text-slate-900">${p.stock}</td>
+            <td class="py-3 px-4 text-slate-500">${p.low_stock_threshold}</td>
+            <td class="py-3 px-4 font-bold text-slate-800">${fmt(p.stock_value)}</td>
+            <td class="py-3 px-4">${statusBadge(p.status)}</td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="openAdjustStockModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="px-3 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-xs">Adjust</button>
+            </td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) { console.error(e); }
+    }
+
+    function openAdjustStockModal(id, name) {
+      $('adjust-prod-id').value = id;
+      $('adjust-prod-name').textContent = name;
+      openModal('modal-adjust-stock');
+    }
+
+    async function handleAdjustStockSubmit(e) {
+      e.preventDefault();
+      const product_id = $('adjust-prod-id').value;
+      const change_type = $('adjust-type').value;
+      const quantity = $('adjust-qty').value;
+      const reason = $('adjust-reason').value;
+
+      try {
+        const res = await fetch(`${API}/inventory/adjust`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product_id, change_type, quantity, reason })
+        });
+        if (res.ok) {
+          closeModal('modal-adjust-stock');
+          showToast('Inventory adjusted successfully!');
+          if (currentRoute === 'inventory') loadInventoryPage();
+          if (currentRoute === 'products') loadProductsPage();
+          loadStats();
+        }
+      } catch (e) { showToast('Stock adjustment failed', 'error'); }
+    }
+
+    // ── Customers Page ────────────────────────────────────────────────────────
+    async function loadCustomersPage() {
+      try {
+        const list = await fetch(`${API}/customers`).then(r => r.json());
+        const tbody = $('customers-tbody');
+        tbody.innerHTML = list.map(c => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3.5 px-4 font-bold text-slate-900">${c.name}</td>
+            <td class="py-3.5 px-4 font-medium text-slate-700">${c.phone}</td>
+            <td class="py-3.5 px-4 text-slate-500">${c.email || '—'}</td>
+            <td class="py-3.5 px-4 font-bold text-slate-800">${c.orders_count || 0}</td>
+            <td class="py-3.5 px-4 font-black text-indigo-600">${fmt(c.total_spent)}</td>
+            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${c.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${c.status}</span></td>
+            <td class="py-3.5 px-4 text-right">
+              <button onclick="toggleCustomerStatus('${c.id}', '${c.status}')" class="text-xs text-slate-500 hover:text-slate-800 font-semibold">${c.status === 'Active' ? 'Disable' : 'Activate'}</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddCustomerModal() {
+      const name = prompt("Enter customer full name:");
+      if (!name) return;
+      const phone = prompt("Enter Kenyan phone number (e.g. 0712345678):");
+      if (!phone) return;
+      const email = prompt("Enter customer email (optional):") || "";
+
+      fetch(`${API}/customers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, phone, email })
+      }).then(r => r.json()).then(() => {
+        showToast('Customer added successfully!');
+        if (currentRoute === 'customers') loadCustomersPage();
+        loadStats();
+      });
+    }
+
+    async function toggleCustomerStatus(id, current) {
+      const newStatus = current === 'Active' ? 'Disabled' : 'Active';
+      await fetch(`${API}/customers/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      showToast(`Customer marked as ${newStatus}`);
+      loadCustomersPage();
+    }
+
+    // ── Promotions Page ───────────────────────────────────────────────────────
+    async function loadPromotionsPage() {
+      try {
+        const list = await fetch(`${API}/promotions`).then(r => r.json());
+        const tbody = $('promotions-tbody');
+        tbody.innerHTML = list.map(p => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3.5 px-4 font-mono font-bold text-indigo-600 text-sm">${p.code}</td>
+            <td class="py-3.5 px-4 font-bold text-slate-900">${p.discount_type === 'Percentage' ? p.discount_value + '%' : fmt(p.discount_value)} OFF</td>
+            <td class="py-3.5 px-4 text-slate-600">${p.description || '—'}</td>
+            <td class="py-3.5 px-4 text-slate-600">${p.min_spend ? fmt(p.min_spend) : 'None'}</td>
+            <td class="py-3.5 px-4 text-slate-500">${p.valid_until || 'No expiry'}</td>
+            <td class="py-3.5 px-4 text-right">
+              <button onclick="deletePromotion('${p.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+            </td>
+          </tr>
+        `).join('');
+        lucide.createIcons();
+      } catch (e) { console.error(e); }
+    }
+
+    function openAddPromotionModal() { openModal('modal-add-promotion'); }
+
+    async function handleAddPromotionSubmit(e) {
+      e.preventDefault();
+      const body = {
+        code: $('new-promo-code').value,
+        discount_type: $('new-promo-type').value,
+        discount_value: $('new-promo-val').value,
+        min_spend: $('new-promo-min').value,
+        description: $('new-promo-desc').value
+      };
+      try {
+        const res = await fetch(`${API}/promotions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        if (res.ok) {
+          closeModal('modal-add-promotion');
+          e.target.reset();
+          showToast('Promotion created!');
+          loadPromotionsPage();
+        }
+      } catch (e) { showToast('Error creating promotion', 'error'); }
+    }
+
+    async function deletePromotion(id) {
+      if (!confirm('Delete coupon code?')) return;
+      await fetch(`${API}/promotions/${id}`, { method: 'DELETE' });
+      showToast('Promotion deleted');
+      loadPromotionsPage();
+    }
+
+    // ── Returns Page ──────────────────────────────────────────────────────────
+    async function loadReturnsPage() {
+      try {
+        const list = await fetch(`${API}/returns`).then(r => r.json());
+        const tbody = $('returns-tbody');
+        tbody.innerHTML = list.map(r => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3.5 px-4 font-mono font-bold text-slate-900">${r.id}</td>
+            <td class="py-3.5 px-4 font-mono text-indigo-600 font-bold">${r.order_id}</td>
+            <td class="py-3.5 px-4 font-medium text-slate-900">${r.customer_name}</td>
+            <td class="py-3.5 px-4 text-slate-700">${r.product_name}</td>
+            <td class="py-3.5 px-4 text-slate-500">${r.reason}</td>
+            <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">${r.status}</span></td>
+            <td class="py-3.5 px-4 text-right">
+              <select onchange="updateReturnStatus('${r.id}', this.value)" class="p-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold">
+                ${['Requested', 'Approved', 'Rejected', 'Received', 'Refunded', 'Completed'].map(s => `
+                  <option value="${s}" ${s === r.status ? 'selected' : ''}>${s}</option>
+                `).join('')}
+              </select>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function updateReturnStatus(id, status) {
+      await fetch(`${API}/returns/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      showToast(`Return status updated to ${status}`);
+    }
+
+    // ── Reviews Page ──────────────────────────────────────────────────────────
+    async function loadReviewsPage() {
+      try {
+        const list = await fetch(`${API}/reviews`).then(r => r.json());
+        const container = $('reviews-list');
+        if (!list || list.length === 0) {
+          container.innerHTML = '<div class="py-12 text-center text-slate-400">No customer reviews yet.</div>';
+          return;
+        }
+
+        container.innerHTML = list.map(rv => `
+          <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm flex items-start justify-between gap-4">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm">${rv.customer_name}</span>
+                <span class="text-amber-500 font-bold text-xs">★ ${rv.rating}</span>
+                <span class="text-xs text-slate-400">• ${rv.created_at.split(' ')[0]}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${rv.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}">${rv.status}</span>
+              </div>
+              <div class="text-xs font-semibold text-indigo-600">Product: ${rv.product_name || 'Item'}</div>
+              <p class="text-xs text-slate-600 mt-1">"${rv.comment}"</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="updateReviewStatus('${rv.id}', '${rv.status === 'Approved' ? 'Hidden' : 'Approved'}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors">
+                ${rv.status === 'Approved' ? 'Hide' : 'Approve'}
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    async function updateReviewStatus(id, status) {
+      await fetch(`${API}/reviews/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      showToast(`Review marked as ${status}`);
+      loadReviewsPage();
+    }
+
+    // ── Reports Page ──────────────────────────────────────────────────────────
+    async function loadReportsPage() {
+      try {
+        const data = await fetch(`${API}/reports/summary`).then(r => r.json());
+        const tbody = $('reports-bestsellers-tbody');
+        tbody.innerHTML = data.bestSellers.map(p => `
+          <tr class="hover:bg-slate-50/50">
+            <td class="py-3 px-4 font-bold text-slate-900">${p.name}</td>
+            <td class="py-3 px-4 font-mono text-slate-500">${p.sku}</td>
+            <td class="py-3 px-4 text-slate-600">${p.category_name}</td>
+            <td class="py-3 px-4 font-bold text-slate-800">${p.sales}</td>
+            <td class="py-3 px-4 font-black text-indigo-600">${fmt(p.revenue)}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error(e); }
+    }
+
+    function exportOrdersCsv() { window.open(`${API}/reports/export?type=sales`); }
+
+    // ── Settings Page ─────────────────────────────────────────────────────────
+    async function loadSettingsPage() {
+      try {
+        const s = await fetch(`${API}/settings`).then(r => r.json());
+        $('set-store-name').value = s.store_name || 'Dokani';
+        $('set-currency').value = s.currency || 'KSh';
+        $('set-phone').value = s.phone || '+254 712 345 678';
+        $('set-email').value = s.email || 'info@dokani.co.ke';
+        $('set-address').value = s.address || 'Kimathi Street, Nairobi CBD, Kenya';
+        $('set-delivery-fee').value = s.delivery_fee || 350;
+        $('set-free-threshold').value = s.free_delivery_threshold || 5000;
+        $('set-mpesa').checked = s.mpesa_enabled !== 'false';
+        $('set-cod').checked = s.cod_enabled !== 'false';
+        $('set-card').checked = s.card_enabled !== 'false';
+
+        loadMpesaSettings();
+      } catch (e) { console.error(e); }
+    }
+
+    // ── M-Pesa Settings Management (Section 3, 5, 6, 20, 21) ─────────────────
+    async function loadMpesaSettings() {
+      try {
+        const conf = await fetch(`${API}/admin/settings/payments/mpesa`).then(r => r.json());
+
+        $('mpesa-set-env').value = conf.environment || 'sandbox';
+        $('mpesa-set-account-type').value = conf.account_type || 'PayBill';
+        $('mpesa-set-shortcode').value = conf.shortcode || '';
+        $('mpesa-set-consumer-key').value = conf.consumer_key || '';
+        $('mpesa-set-consumer-secret').value = conf.consumer_secret_masked || '';
+        $('mpesa-set-passkey').value = conf.passkey_masked || '';
+        $('mpesa-set-callback-url').value = conf.callback_url || '';
+
+        onMpesaEnvChange(conf.environment || 'sandbox');
+        updateMpesaStatusBadge(conf.status);
+      } catch (e) {
+        console.error('Failed to load M-Pesa settings:', e);
+        updateMpesaStatusBadge('Configuration Error');
+      }
+    }
+
+    function onMpesaEnvChange(env) {
+      const warn = $('mpesa-prod-warning');
+      if (warn) {
+        if (env === 'production') {
+          warn.classList.remove('hidden');
+        } else {
+          warn.classList.add('hidden');
+        }
+      }
+    }
+
+    function updateMpesaStatusBadge(status) {
+      const badge = $('mpesa-config-status-badge');
+      if (!badge) return;
+      if (status === 'Connected') {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Connected';
+      } else if (status === 'Configuration Error') {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300 inline-flex items-center gap-1';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span> Configuration Error';
+      } else {
+        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-300 inline-flex items-center gap-1';
+        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Not Configured';
+      }
+    }
+
+    async function handleSaveMpesaConfig() {
+      const btn = $('btn-save-mpesa');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const payload = {
+        environment: $('mpesa-set-env').value,
+        account_type: $('mpesa-set-account-type').value,
+        shortcode: $('mpesa-set-shortcode').value,
+        consumer_key: $('mpesa-set-consumer-key').value,
+        consumer_secret: $('mpesa-set-consumer-secret').value,
+        passkey: $('mpesa-set-passkey').value,
+        callback_url: $('mpesa-set-callback-url').value
+      };
+
+      try {
+        const res = await fetch(`${API}/admin/settings/payments/mpesa`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('M-Pesa configuration saved successfully!');
+          loadMpesaSettings();
+        } else {
+          showToast(data.error || 'Failed to save configuration', 'error');
+        }
+      } catch (e) {
+        showToast('Network error saving M-Pesa configuration', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save M-Pesa';
+      }
+    }
+
+    async function handleTestMpesaConnection() {
+      const btn = $('btn-test-mpesa');
+      const alertBox = $('mpesa-test-alert');
+      const alertMsg = $('mpesa-test-msg');
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-1">◌</span> Testing…`;
+
+      try {
+        const res = await fetch(`${API}/admin/settings/payments/mpesa/test`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        alertBox.classList.remove('hidden');
+        if (data.success) {
+          alertBox.className = 'p-3 rounded-xl text-xs font-medium border bg-emerald-50 text-emerald-800 border-emerald-200 flex items-center justify-between';
+          alertMsg.innerHTML = `<strong>✓ M-Pesa connection successful!</strong> Authenticated with Safaricom Daraja (${(data.environment || 'sandbox').toUpperCase()} shortcode ${data.shortcode || '174379'}).`;
+          showToast('M-Pesa connection verified!');
+          updateMpesaStatusBadge('Connected');
+        } else {
+          alertBox.className = 'p-3 rounded-xl text-xs font-medium border bg-rose-50 text-rose-800 border-rose-200 flex items-center justify-between';
+          alertMsg.innerHTML = `<strong>✕ M-Pesa connection failed:</strong> ${data.error || 'Unable to authenticate with Daraja.'}`;
+          showToast('Connection test failed', 'error');
+          updateMpesaStatusBadge('Configuration Error');
+        }
+      } catch (e) {
+        alertBox.classList.remove('hidden');
+        alertBox.className = 'p-3 rounded-xl text-xs font-medium border bg-rose-50 text-rose-800 border-rose-200 flex items-center justify-between';
+        alertMsg.textContent = '✕ Network error testing M-Pesa connection.';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="activity" class="w-3.5 h-3.5"></i><span>Test Connection</span>`;
+        lucide.createIcons();
+      }
+    }
+
+    // ── Payments Management Page (Section 16, 19) ─────────────────────────────
+    let currentPaymentStatusFilter = 'All';
+    let currentPaymentSearch = '';
+    let searchPaymentDebounceTimer = null;
+
+    async function loadPaymentsPage() {
+      loadPaymentStats();
+      loadPaymentsTable();
+    }
+
+    async function loadPaymentStats() {
+      try {
+        const stats = await fetch(`${API}/admin/payments/stats`).then(r => r.json());
+        $('pay-stat-today').textContent = fmt(stats.todaySales);
+        $('pay-stat-pending').textContent = stats.pendingCount;
+        $('pay-stat-success').textContent = stats.successCount;
+        $('pay-stat-failed').textContent = stats.failedCount;
+        $('pay-stat-revenue').textContent = fmt(stats.totalRevenue);
+      } catch (e) {
+        console.error('Failed to load payment stats:', e);
+      }
+    }
+
+    async function loadPaymentsTable() {
+      const tbody = $('payments-page-tbody');
+      try {
+        let url = `${API}/admin/payments?limit=50`;
+        if (currentPaymentStatusFilter !== 'All') {
+          url += `&status=${encodeURIComponent(currentPaymentStatusFilter)}`;
+        }
+        if (currentPaymentSearch) {
+          url += `&search=${encodeURIComponent(currentPaymentSearch)}`;
+        }
+
+        const res = await fetch(url).then(r => r.json());
+        renderPaymentsTable(res.data || []);
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="10" class="py-10 text-center text-rose-500">Error loading payments</td></tr>';
+      }
+    }
+
+    function filterPaymentsByStatus(status) {
+      currentPaymentStatusFilter = status;
+      document.querySelectorAll('#payment-status-tabs .payment-tab').forEach(b => {
+        if (b.getAttribute('data-status') === status) {
+          b.className = 'payment-tab active px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-colors';
+        } else {
+          b.className = 'payment-tab px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors';
+        }
+      });
+      loadPaymentsTable();
+    }
+
+    function handlePaymentsSearch(q) {
+      clearTimeout(searchPaymentDebounceTimer);
+      searchPaymentDebounceTimer = setTimeout(() => {
+        currentPaymentSearch = q.trim();
+        loadPaymentsTable();
+      }, 300);
+    }
+
+    function renderPaymentsTable(list) {
+      const tbody = $('payments-page-tbody');
+      if (!list || list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-400">No payment transactions found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = list.map(p => {
+        const statusCls = {
+          'paid': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          'pending': 'bg-amber-50 text-amber-700 border-amber-200',
+          'failed': 'bg-rose-50 text-rose-700 border-rose-200',
+          'cancelled': 'bg-slate-100 text-slate-700 border-slate-200',
+          'timeout': 'bg-amber-50 text-amber-700 border-amber-200'
+        }[p.status] || 'bg-slate-100 text-slate-600 border-slate-200';
+
+        const receiptDisplay = p.mpesa_receipt_number || p.transaction_ref || '—';
+
+        return `
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3.5 px-4 font-mono font-bold text-slate-900 text-[11px]">${p.id}</td>
+            <td class="py-3.5 px-4">
+              <a href="#" onclick="event.preventDefault(); viewOrderDetail('${p.order_id}')" class="font-mono font-bold text-indigo-600 hover:underline">
+                ${p.order_id}
+              </a>
+            </td>
+            <td class="py-3.5 px-4 font-medium text-slate-800">${p.customer_name || 'Guest Customer'}</td>
+            <td class="py-3.5 px-4 font-mono text-slate-600">${p.phone_number || '—'}</td>
+            <td class="py-3.5 px-4 font-black text-slate-900">${fmt(p.amount)}</td>
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1 font-semibold text-slate-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                ${p.payment_method === 'mpesa_stk' ? 'M-Pesa STK' : (p.payment_method || 'M-Pesa')}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 font-mono font-bold text-emerald-700">${receiptDisplay}</td>
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase border ${statusCls}">
+                ${p.status}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-slate-500 text-[11px]">${(p.created_at || '').split(' ')[0]}</td>
+            <td class="py-3.5 px-4 text-right">
+              <button onclick="viewPaymentDetail('${p.id}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-xs transition-colors">
+                Details
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    async function viewPaymentDetail(id) {
+      try {
+        const p = await fetch(`${API}/admin/payments/${id}`).then(r => r.json());
+        $('modal-pay-id').textContent = `Transaction ${p.id}`;
+        $('modal-pay-sub').textContent = `Recorded on ${p.created_at} • Provider: ${p.provider || 'mpesa'}`;
+
+        const callbackSection = p.raw_callback_parsed
+          ? `<pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl overflow-x-auto text-[10px] font-mono leading-relaxed">${JSON.stringify(p.raw_callback_parsed, null, 2)}</pre>`
+          : `<p class="text-slate-400 text-xs italic">No raw webhook callback recorded.</p>`;
+
+        const auditHtml = (p.audit_logs && p.audit_logs.length > 0)
+          ? p.audit_logs.map(a => `
+              <div class="py-1.5 border-b border-slate-100 flex justify-between text-[11px]">
+                <span class="font-medium text-slate-700">${a.action}: ${a.details}</span>
+                <span class="text-slate-400 font-mono">${a.created_at}</span>
+              </div>
+            `).join('')
+          : `<p class="text-slate-400 text-xs italic">No audit trail entries for this transaction.</p>`;
+
+        $('modal-pay-body').innerHTML = `
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 grid grid-cols-2 gap-3">
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Order Reference</span>
+              <div class="font-mono font-bold text-indigo-600 text-sm">${p.order_id}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Customer</span>
+              <div class="font-bold text-slate-800 text-sm">${p.customer_name || 'Guest'}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Amount</span>
+              <div class="font-black text-slate-900 text-base">${fmt(p.amount)}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Payment Status</span>
+              <div class="font-bold text-sm uppercase text-slate-900">${p.status}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">M-Pesa Receipt Number</span>
+              <div class="font-mono font-black text-emerald-600 text-sm">${p.mpesa_receipt_number || p.transaction_ref || 'Pending'}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">M-Pesa Phone Number</span>
+              <div class="font-mono font-bold text-slate-800 text-sm">${p.phone_number || '—'}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Merchant Request ID</span>
+              <div class="font-mono text-slate-600 text-xs">${p.merchant_request_id || '—'}</div>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[10px] uppercase font-bold">Checkout Request ID</span>
+              <div class="font-mono text-slate-600 text-xs">${p.checkout_request_id || '—'}</div>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 text-xs mb-2">Audit Trail</h4>
+            <div class="bg-white p-3 rounded-xl border border-slate-200 space-y-1">
+              ${auditHtml}
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 text-xs mb-2">Safaricom Webhook Callback Payload</h4>
+            ${callbackSection}
+          </div>
+        `;
+
+        openModal('modal-payment-detail');
+        lucide.createIcons();
+      } catch (e) {
+        showToast('Failed to load payment detail', 'error');
+      }
+    }
+
+    async function handleSaveSettings(e) {
+      e.preventDefault();
+      const body = {
+        store_name: $('set-store-name').value,
+        phone: $('set-phone').value,
+        email: $('set-email').value,
+        address: $('set-address').value,
+        delivery_fee: $('set-delivery-fee').value,
+        free_delivery_threshold: $('set-free-threshold').value,
+        mpesa_enabled: $('set-mpesa').checked,
+        cod_enabled: $('set-cod').checked,
+        card_enabled: $('set-card').checked
+      };
+
+      try {
+        await fetch(`${API}/settings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        showToast('Settings saved successfully!');
+      } catch (e) { showToast('Failed to save settings', 'error'); }
+    }
+
+    // ── Analytics Chart ───────────────────────────────────────────────────────
+    function initAnalyticsChart() {
+      const ctx = $('analyticsChart').getContext('2d');
+      if (analyticsChartInstance) analyticsChartInstance.destroy();
+      analyticsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+          datasets: [{
+            label: 'Revenue (KSh)',
+            data: [2450000, 2600000, 2800000, 3100000, 3400000, 3850000],
+            backgroundColor: '#4f46e5',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { ticks: { callback: v => 'KSh ' + (v/1000000) + 'M' } }
+          }
+        }
+      });
+    }
+
+    // ── Global Search ─────────────────────────────────────────────────────────
+    function handleGlobalSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) {
+        if (currentRoute === 'products') renderProductsGrid(cachedProducts);
+        if (currentRoute === 'orders') renderOrdersTable(cachedOrders);
+        return;
+      }
+
+      if (currentRoute === 'products') {
+        const filtered = cachedProducts.filter(p => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+        renderProductsGrid(filtered);
+      } else if (currentRoute === 'orders') {
+        const filtered = cachedOrders.filter(o => o.customer_name.toLowerCase().includes(q) || o.id.toLowerCase().includes(q));
+        renderOrdersTable(filtered);
+      }
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    async function boot() {
+      lucide.createIcons();
+      await Promise.all([
+        buildNav(),
+        loadUser()
+      ]);
+      resolveInitialRoute();
+    }
+
+    boot();
+  </script>
+</body>
+</html>

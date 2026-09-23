@@ -1,0 +1,35 @@
+[
+  {
+    "id": "RET-2041",
+    "orderId": "#1023",
+    "customer": "Sophia Taylor",
+    "productName": "Nike Air Zoom Pegasus 39",
+    "productImage": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&auto=format&fit=crop&q=80",
+    "reason": "Size too small (requested UK 9 instead of UK 8)",
+    "amount": 129.99,
+    "date": "Sep 09, 2026",
+    "status": "Pending"
+  },
+  {
+    "id": "RET-2042",
+    "orderId": "#1019",
+    "customer": "Liam Anderson",
+    "productName": "Leather Minimalist Backpack",
+    "productImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=100&auto=format&fit=crop&q=80",
+    "reason": "Zippers were slightly stiff upon unboxing",
+    "amount": 89.50,
+    "date": "Sep 08, 2026",
+    "status": "Pending"
+  },
+  {
+    "id": "RET-2038",
+    "orderId": "#1002",
+    "customer": "Jessica Alba",
+    "productName": "Ceramic Pour-Over Dripper",
+    "productImage": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=100&auto=format&fit=crop&q=80",
+    "reason": "Changed mind before shipment delivered",
+    "amount": 42.00,
+    "date": "Aug 28, 2026",
+    "status": "Approved"
+  }
+]

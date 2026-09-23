@@ -1,0 +1,32 @@
+[
+  {
+    "id": "REV-1",
+    "customer": "David Miller",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80",
+    "product": "Nike Air Zoom Pegasus 39",
+    "rating": 5,
+    "date": "Sep 07, 2026",
+    "comment": "Incredible running shoes! The cushioning is superb and they feel very light. Fast delivery too.",
+    "reply": "Thank you so much David! Happy running! 🏃‍♂️"
+  },
+  {
+    "id": "REV-2",
+    "customer": "Jessica Taylor",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80",
+    "product": "Ceramic Pour-Over Coffee Dripper",
+    "rating": 5,
+    "date": "Sep 04, 2026",
+    "comment": "Makes the best morning coffee ritual. The glaze finish is premium and easy to rinse clean.",
+    "reply": null
+  },
+  {
+    "id": "REV-3",
+    "customer": "Alexander Wright",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&auto=format&fit=crop&q=80",
+    "product": "Wireless Noise-Canceling Headphones",
+    "rating": 4,
+    "date": "Aug 29, 2026",
+    "comment": "Great soundstage and battery life. Only wish the carrying pouch was a hard case.",
+    "reply": "Thanks Alexander! We'll pass your feedback to our design team."
+  }
+]

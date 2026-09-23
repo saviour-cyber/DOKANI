@@ -1,0 +1,74 @@
+[
+  {
+    "id": "prod_01",
+    "name": "Nike Air Zoom Pegasus 39",
+    "category": "Footwear",
+    "sku": "NK-AZ-39-BLK",
+    "price": 129.99,
+    "stock": 45,
+    "sales": 320,
+    "rating": 4.8,
+    "status": "In Stock",
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "prod_02",
+    "name": "Minimalist Leather Backpack",
+    "category": "Accessories",
+    "sku": "BG-LTHR-BRN",
+    "price": 89.50,
+    "stock": 18,
+    "sales": 142,
+    "rating": 4.6,
+    "status": "In Stock",
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=200&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "prod_03",
+    "name": "Wireless Noise-Canceling Headphones",
+    "category": "Electronics",
+    "sku": "EL-HDPH-NC",
+    "price": 199.00,
+    "stock": 4,
+    "sales": 289,
+    "rating": 4.9,
+    "status": "Low Stock",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "prod_04",
+    "name": "Organic Cotton Oversized Tee",
+    "category": "Apparel",
+    "sku": "AP-TEE-WHT",
+    "price": 34.00,
+    "stock": 0,
+    "sales": 510,
+    "rating": 4.5,
+    "status": "Out of Stock",
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "prod_05",
+    "name": "Ceramic Pour-Over Coffee Dripper",
+    "category": "Home & Kitchen",
+    "sku": "HK-DRIP-CRM",
+    "price": 42.00,
+    "stock": 32,
+    "sales": 96,
+    "rating": 4.7,
+    "status": "In Stock",
+    "image": "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=200&auto=format&fit=crop&q=80"
+  },
+  {
+    "id": "prod_06",
+    "name": "Classic Aviator Polarized Sunglasses",
+    "category": "Accessories",
+    "sku": "AC-AVTR-GLD",
+    "price": 65.00,
+    "stock": 25,
+    "sales": 180,
+    "rating": 4.6,
+    "status": "In Stock",
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=200&auto=format&fit=crop&q=80"
+  }
+]

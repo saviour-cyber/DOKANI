@@ -1,0 +1,6 @@
+﻿{
+  "messages": { "count": 3, "hasNew": true },
+  "alerts":   { "count": 5, "hasNew": true },
+  "returnRequests": { "count": 2 },
+  "newOrdersBadge": 2
+}
